@@ -10,6 +10,7 @@ import {
   IconCopy,
   IconDownload,
   IconEye,
+  IconMaximize,
   IconPause,
   IconPlay,
   IconRepeat,
@@ -17,9 +18,13 @@ import {
   IconSearch,
   IconSkipBack,
   IconSkipFwd,
+  IconVolume,
+  IconVolumeLow,
+  IconVolumeMute,
   IconWarn,
   IconX,
 } from "./icons";
+
 
 export type ViewMode = "sync" | "speech" | "visual";
 
@@ -70,6 +75,8 @@ export function TranscriptWorkspace({ job, registerShortcuts, onTranscriptEdited
   const [loop, setLoopState] = useState<{ a: number | null; b: number | null }>({ a: null, b: null });
   const [hud, setHud] = useState(true);
   const [looping, setLooping] = useState(false);
+  const [volume, setVolume] = useState(1);
+  const [muted, setMuted] = useState(false);
 
   const doc = job.transcript;
   const words = doc?.words ?? [];
@@ -280,6 +287,25 @@ export function TranscriptWorkspace({ job, registerShortcuts, onTranscriptEdited
     searchRef.current?.select();
   }, []);
 
+  const toggleMute = useCallback(() => {
+    setMuted((m) => {
+      const next = !m;
+      if (mediaRef.current) mediaRef.current.muted = next;
+      return next;
+    });
+  }, []);
+
+  const handleVolumeChange = useCallback((v: number) => {
+    const clamped = Math.max(0, Math.min(1, v));
+    setVolume(clamped);
+    setMuted(clamped === 0);
+    if (mediaRef.current) {
+      mediaRef.current.volume = clamped;
+      mediaRef.current.muted = clamped === 0;
+    }
+  }, []);
+
+
   const api = useMemo<ShortcutApi>(
     () => ({
       toggle,
@@ -439,6 +465,32 @@ export function TranscriptWorkspace({ job, registerShortcuts, onTranscriptEdited
             >
               <IconEye size={12} /> HUD {hud ? "on" : "off"}
             </button>
+            <button
+              type="button"
+              onClick={() => {
+                const el = mediaRef.current as HTMLVideoElement | null;
+                if (!el) return;
+                if (document.pictureInPictureElement) void document.exitPictureInPicture();
+                else void el.requestPictureInPicture?.();
+              }}
+              className="pointer-events-auto inline-flex items-center gap-1 rounded-md border border-white/15 bg-black/65 px-2 py-1 font-mono text-[10px] text-white/85 backdrop-blur transition-colors hover:bg-black/85"
+              title="Picture in Picture"
+            >
+              PiP
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                const el = mediaRef.current?.parentElement;
+                if (!el) return;
+                if (document.fullscreenElement) void document.exitFullscreen();
+                else void el.requestFullscreen?.();
+              }}
+              className="pointer-events-auto inline-flex items-center gap-1 rounded-md border border-white/15 bg-black/65 px-2 py-1 font-mono text-[10px] text-white/85 backdrop-blur transition-colors hover:bg-black/85"
+              title="Fullscreen"
+            >
+              <IconMaximize size={11} />
+            </button>
           </div>
           {hud && (activeObs || (curSentence >= 0 && sentences[curSentence])) && (
             <div className="pointer-events-none absolute inset-x-0 bottom-0 space-y-1.5 bg-gradient-to-t from-black/90 via-black/55 to-transparent px-4 pt-8 pb-3">
@@ -570,12 +622,49 @@ export function TranscriptWorkspace({ job, registerShortcuts, onTranscriptEdited
             <IconButton label="Next sentence (Shift+L)" onClick={() => stepSentence(1)}>
               <IconSkipFwd size={15} />
             </IconButton>
+            {playing && (
+              <span className="live-eq-bar shrink-0 ml-1" title="Playing">
+                <span />
+                <span />
+                <span />
+              </span>
+            )}
           </div>
 
           <div className="num flex items-baseline gap-1 font-mono text-[12px]">
             <span className="font-semibold text-[var(--fg)]">{fmtClock(time)}</span>
             <span className="text-[var(--fg-faint)]">/ {fmtClock(duration)}</span>
           </div>
+
+          {/* Volume / Mute Slider */}
+          <div className="flex items-center gap-1 group/vol">
+            <IconButton
+              label={muted || volume === 0 ? "Unmute" : "Mute"}
+              onClick={toggleMute}
+              className="h-7 w-7 text-[var(--fg-muted)] hover:text-[var(--fg)]"
+            >
+              {muted || volume === 0 ? (
+                <IconVolumeMute size={14} />
+              ) : volume < 0.5 ? (
+                <IconVolumeLow size={14} />
+              ) : (
+                <IconVolume size={14} />
+              )}
+            </IconButton>
+            <div className="w-14 hidden sm:flex items-center">
+              <input
+                type="range"
+                min={0}
+                max={1}
+                step={0.05}
+                value={muted ? 0 : volume}
+                onChange={(e) => handleVolumeChange(Number.parseFloat(e.target.value))}
+                className="scrub w-full h-1"
+                title={`Volume: ${Math.round((muted ? 0 : volume) * 100)}%`}
+              />
+            </div>
+          </div>
+
 
           <Tip tip={`Playback speed (${rate}×) — click to cycle, right-click to slow`}>
             <button
