@@ -3,7 +3,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { useJobStream } from "@/hooks/useJobStream";
 import { fmtBytes, fmtClock, relTime } from "@/lib/format";
 import type { AppSettings, JobSummary, KeyInfo } from "@/lib/types";
-import { Badge, Button, Card, Empty, IconButton, Input, Kbd, Progress, Segmented, Spinner, StatusDot, ToastContainer } from "./ui";
+import { Badge, Button, Card, Empty, IconButton, Input, Kbd, Progress, Segmented, Spinner, StatusDot, ToastContainer, toast } from "./ui";
 import {
   IconBolt,
   IconFilm,
@@ -148,11 +148,13 @@ function Workspace() {
   const deleteJob = async (id: string) => {
     await fetch(`/api/jobs/${id}`, { method: "DELETE" });
     if (selectedId === id) select(null);
+    toast("Job removed from library", "info");
     void refresh(true);
   };
 
   const cancelJob = async (id: string) => {
     await fetch(`/api/jobs/${id}/cancel`, { method: "POST" });
+    toast("Processing cancelled", "warning");
     void refresh(true);
   };
 
@@ -160,9 +162,10 @@ function Workspace() {
     const r = await fetch(`/api/jobs/${id}/retry`, { method: "POST" });
     if (!r.ok) {
       const d = await r.json().catch(() => ({}));
-      alert(d.error || "Could not queue retry");
+      toast(d.error || "Could not queue retry", "danger");
       return;
     }
+    toast("Retry queued for incomplete chunks", "accent");
     void refresh(true);
   };
 
@@ -170,9 +173,10 @@ function Workspace() {
     const r = await fetch(`/api/jobs/${id}/realign`, { method: "POST" });
     if (!r.ok) {
       const d = await r.json().catch(() => ({}));
-      alert(d.error || "Could not start re-alignment");
+      toast(d.error || "Could not start re-alignment", "danger");
       return;
     }
+    toast("Acoustic forced alignment queued", "accent");
     void refresh(true);
   };
 
@@ -186,10 +190,12 @@ function Workspace() {
     });
     if (res.ok) {
       const d = await res.json();
+      toast("Job renamed successfully", "success");
       if (d.transcript) updateTranscriptOptimistic(d.transcript, d.filename);
       else void refresh(true);
     }
   };
+
 
   return (
     <div className="min-h-screen">
@@ -243,8 +249,21 @@ function Workspace() {
 
           {/* Right Studio Controls + Explicit Bright / Dark / Auto Switcher */}
           <div className="flex items-center gap-2">
+            {/* Live SSE Sync Indicator */}
+            <div
+              className="hidden items-center gap-1.5 rounded-lg border border-[var(--border)] bg-[var(--surface-2)] px-2 py-1 font-mono text-[10.5px] text-[var(--fg-muted)] sm:flex"
+              title={liveConnected ? "Live server-sent events stream active" : "Reconnecting to event stream"}
+            >
+              <span
+                className={`h-1.5 w-1.5 rounded-full ${
+                  liveConnected ? "bg-[var(--success)] shadow-[0_0_8px_var(--success)] animate-pulse" : "bg-[var(--warning)]"
+                }`}
+              />
+              <span className="hidden lg:inline">{liveConnected ? "Live Sync" : "Syncing"}</span>
+            </div>
+
             {queueRunning && (
-              <Badge tone="accent">
+              <Badge tone="accent" pulse dot>
                 <Spinner className="h-2.5 w-2.5" /> running
               </Badge>
             )}
@@ -634,9 +653,9 @@ function JobRow({
   const active = job.status === "working" || job.status === "queued";
   return (
     <div
-      className={`group relative cursor-pointer rounded-lg border px-2.5 py-2 transition-colors ${
+      className={`group relative cursor-pointer rounded-lg border px-2.5 py-2 transition-all duration-150 ${
         selected
-          ? "border-[var(--accent-border)] bg-[var(--accent-soft)]"
+          ? "border-[var(--accent-border)] bg-[var(--accent-soft)] glow-accent shadow-xs"
           : "border-transparent hover:bg-[var(--surface-2)]"
       }`}
       onClick={onSelect}
@@ -659,6 +678,13 @@ function JobRow({
           {job.mediaKind === "video" ? <IconFilm size={12} /> : <IconWave size={12} />}
         </span>
         <span className="min-w-0 flex-1 truncate text-[12px] font-medium text-[var(--fg)]">{job.filename}</span>
+        {job.status === "working" && (
+          <span className="live-eq-bar shrink-0" title="Processing audio pipeline">
+            <span />
+            <span />
+            <span />
+          </span>
+        )}
         <span className="flex shrink-0 items-center gap-0.5 opacity-0 transition-opacity group-hover:opacity-100">
           {active && (
             <button
