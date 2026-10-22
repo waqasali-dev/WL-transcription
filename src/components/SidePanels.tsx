@@ -172,29 +172,36 @@ export function DrawerModal({
   title,
   subtitle,
   onClose,
+  width = "lg",
   children,
 }: {
   open: boolean;
   title: string;
   subtitle?: string;
   onClose: () => void;
+  width?: "md" | "lg" | "xl";
   children: React.ReactNode;
 }) {
   if (!open) return null;
+  const widthClass =
+    width === "xl" ? "max-w-2xl" : width === "lg" ? "max-w-xl" : "max-w-md sm:max-w-lg";
+
   return (
     <div className="fixed inset-0 z-[110] flex justify-end" role="dialog" aria-modal>
       <div className="fixed inset-0 bg-[var(--overlay)] backdrop-blur-xs" onClick={onClose} />
-      <div className="relative z-10 flex h-full w-full max-w-md animate-fade flex-col border-l border-[var(--border-strong)] bg-[var(--surface)] shadow-[var(--shadow-lg)]">
-        <div className="flex items-center justify-between border-b border-[var(--border)] px-4 py-3">
+      <div
+        className={`relative z-10 flex h-full w-full ${widthClass} animate-fade flex-col border-l border-[var(--border-strong)] bg-[var(--surface)] shadow-[var(--shadow-lg)]`}
+      >
+        <div className="flex items-center justify-between border-b border-[var(--border)] px-5 py-3.5">
           <div>
-            <h2 className="text-[13.5px] font-semibold text-[var(--fg)]">{title}</h2>
-            {subtitle && <p className="font-mono text-[10.5px] text-[var(--fg-subtle)]">{subtitle}</p>}
+            <h2 className="text-[14px] font-semibold text-[var(--fg)]">{title}</h2>
+            {subtitle && <p className="font-mono text-[11px] text-[var(--fg-subtle)] mt-0.5">{subtitle}</p>}
           </div>
           <IconButton label="Close" onClick={onClose}>
             <IconX size={15} />
           </IconButton>
         </div>
-        <div className="flex-1 overflow-y-auto p-4">{children}</div>
+        <div className="flex-1 overflow-y-auto px-5 py-4">{children}</div>
       </div>
     </div>
   );
@@ -429,88 +436,104 @@ export function SettingsCard({ value, onChange }: { value: AppSettings | null; o
           )}
         </div>
 
-        {/* Model Rows */}
-        <div className="space-y-2">
+        {/* Model Cards */}
+        <div className="space-y-2.5">
           {models.map((m) => {
             const isCustom = !defaultNames.has(m.model);
+            const prioColor =
+              m.priority === 1
+                ? "#f59e0b"
+                : m.priority === 2
+                  ? "#3b82f6"
+                  : m.priority === 3
+                    ? "#8b5cf6"
+                    : m.priority != null
+                      ? "#10b981"
+                      : "var(--fg-subtle)";
+
             return (
               <div
                 key={m.model}
-                className="flex items-center justify-between gap-2.5 rounded-lg border border-[var(--border)] bg-[var(--surface)] p-2.5 transition-colors hover:border-[var(--accent)]/40"
+                className="rounded-lg border border-[var(--border)] bg-[var(--surface)] p-3 transition-colors hover:border-[var(--accent)]/40 space-y-2.5"
               >
-                <div className="min-w-0 flex-1">
-                  <div className="flex items-center gap-1.5">
-                    <span className="truncate font-mono text-[12px] font-medium text-[var(--fg)]">
+                {/* Row 1: Model Name + Tag + Delete */}
+                <div className="flex items-center justify-between gap-2">
+                  <div className="flex items-center gap-2 min-w-0">
+                    <span className="font-mono text-[12.5px] font-semibold text-[var(--fg)] truncate">
                       {m.model}
                     </span>
-                    {isCustom && (
-                      <span className="rounded bg-[var(--accent)]/15 px-1.5 py-0.2 font-mono text-[9px] font-semibold text-[var(--accent)]">
+                    {isCustom ? (
+                      <span className="rounded bg-[var(--accent)]/15 px-1.5 py-0.5 font-mono text-[9px] font-bold text-[var(--accent)] shrink-0">
                         CUSTOM
+                      </span>
+                    ) : (
+                      <span className="rounded bg-[var(--surface-3)] px-1.5 py-0.5 font-mono text-[9px] text-[var(--fg-subtle)] shrink-0">
+                        DEFAULT
                       </span>
                     )}
                   </div>
-                  <div className="mt-0.5 flex items-center gap-1.5 text-[10.5px] font-mono text-[var(--fg-subtle)]">
-                    <span>{m.rpm} RPM</span>
-                    <span>·</span>
-                    <span>{m.rpd} RPD</span>
-                    {m.priority !== null && (
-                      <>
-                        <span>·</span>
-                        <span
-                          className="font-medium"
-                          style={{
-                            color:
-                              m.priority === 1
-                                ? "#f59e0b"
-                                : m.priority === 2
-                                  ? "#3b82f6"
-                                  : m.priority === 3
-                                    ? "#8b5cf6"
-                                    : "#10b981",
-                          }}
-                        >
-                          {m.priority === 1
-                            ? "Priority 1 (First)"
-                            : m.priority === 2
-                              ? "Priority 2 (Second)"
-                              : `Priority ${m.priority}`}
-                        </span>
-                      </>
+
+                  <div className="flex items-center gap-1.5 shrink-0">
+                    {models.length > 1 && (
+                      <button
+                        type="button"
+                        onClick={() => handleRemoveModel(m.model)}
+                        className="flex h-7 w-7 items-center justify-center rounded-md text-[var(--fg-subtle)] hover:bg-[var(--surface-3)] hover:text-[var(--danger)] transition-colors"
+                        title={`Remove ${m.model}`}
+                        aria-label={`Remove ${m.model}`}
+                      >
+                        <IconTrash size={13} />
+                      </button>
                     )}
                   </div>
                 </div>
 
-                <div className="flex items-center gap-2">
-                  <select
-                    value={m.priority ?? ""}
-                    onChange={(e) =>
-                      handleSetPriority(m.model, e.target.value === "" ? null : Number(e.target.value))
-                    }
-                    className="h-8 rounded-md border border-[var(--border)] bg-[var(--surface-2)] px-2 font-mono text-[11.5px] text-[var(--fg)] focus:border-[var(--accent)] focus:outline-none"
-                    aria-label={`Priority for ${m.model}`}
-                  >
-                    <option value="">Unset (Fallback)</option>
-                    {Array.from({ length: totalPriorities }, (_, i) => i + 1).map((p) => {
-                      const takenBy = models.find((x) => x.priority === p && x.model !== m.model);
-                      return (
-                        <option key={p} value={p} disabled={Boolean(takenBy)}>
-                          {`Priority ${p}${takenBy ? ` (taken by ${takenBy.model.replace("gemini-", "")})` : ""}`}
-                        </option>
-                      );
-                    })}
-                  </select>
+                {/* Row 2: Limits badges on left, Priority picker on right */}
+                <div className="flex items-center justify-between gap-3 pt-2 border-t border-[var(--border)]/60">
+                  <div className="flex items-center gap-1.5 font-mono text-[10.5px] text-[var(--fg-subtle)] shrink-0">
+                    <span className="inline-flex items-center rounded bg-[var(--surface-2)] px-2 py-0.5 font-medium border border-[var(--border)]/60">
+                      {m.rpm} RPM
+                    </span>
+                    <span>·</span>
+                    <span className="inline-flex items-center rounded bg-[var(--surface-2)] px-2 py-0.5 font-medium border border-[var(--border)]/60">
+                      {m.rpd} RPD
+                    </span>
+                  </div>
 
-                  {models.length > 1 && (
-                    <button
-                      type="button"
-                      onClick={() => handleRemoveModel(m.model)}
-                      className="flex h-8 w-8 items-center justify-center rounded-md text-[var(--fg-subtle)] hover:bg-[var(--surface-3)] hover:text-[var(--danger)] transition-colors"
-                      title={`Remove ${m.model}`}
-                      aria-label={`Remove ${m.model}`}
+                  <div className="flex items-center gap-2 shrink-0">
+                    <span
+                      className="text-[11px] font-mono font-semibold"
+                      style={{ color: prioColor }}
                     >
-                      <IconTrash size={13} />
-                    </button>
-                  )}
+                      {m.priority === 1
+                        ? "1st Priority"
+                        : m.priority === 2
+                          ? "2nd Priority"
+                          : m.priority === 3
+                            ? "3rd Priority"
+                            : m.priority != null
+                              ? `Priority ${m.priority}`
+                              : "Unset"}
+                    </span>
+                    <select
+                      value={m.priority ?? ""}
+                      onChange={(e) =>
+                        handleSetPriority(m.model, e.target.value === "" ? null : Number(e.target.value))
+                      }
+                      className="h-8 min-w-[135px] max-w-[185px] rounded-md border border-[var(--border)] bg-[var(--surface-2)] px-2 font-mono text-[11px] text-[var(--fg)] focus:border-[var(--accent)] focus:outline-none"
+                      aria-label={`Priority for ${m.model}`}
+                    >
+                      <option value="">Unset (Fallback)</option>
+                      {Array.from({ length: totalPriorities }, (_, i) => i + 1).map((p) => {
+                        const takenBy = models.find((x) => x.priority === p && x.model !== m.model);
+                        return (
+                          <option key={p} value={p} disabled={Boolean(takenBy)}>
+                            {`Priority ${p}${takenBy ? ` (${takenBy.model.replace("gemini-", "")})` : ""}`}
+                          </option>
+                        );
+                      })}
+                    </select>
+                  </div>
                 </div>
               </div>
             );
@@ -518,15 +541,18 @@ export function SettingsCard({ value, onChange }: { value: AppSettings | null; o
         </div>
 
         {/* ── Add Custom Model ───────────────────────────────────────────── */}
-        <div className="rounded-lg border border-dashed border-[var(--border)] bg-[var(--surface)]/70 p-3 space-y-2.5">
+        <div className="rounded-xl border border-dashed border-[var(--border)] bg-[var(--surface)] p-3.5 space-y-3">
           <div className="flex items-center justify-between">
-            <span className="text-[12px] font-medium text-[var(--fg)]">+ Add Another Model</span>
-            <span className="text-[10px] text-[var(--fg-subtle)]">Available for all API keys</span>
+            <span className="text-[12px] font-semibold text-[var(--fg)] flex items-center gap-1.5">
+              <IconPlus size={13} className="text-[var(--accent)]" />
+              <span>Add Another Model to Pool</span>
+            </span>
+            <span className="text-[10px] text-[var(--fg-subtle)] font-mono">Usable for all keys</span>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-4 gap-2">
-            <div className="sm:col-span-2">
-              <label className="block text-[10px] text-[var(--fg-subtle)] mb-0.5">Model Name</label>
+          <div className="space-y-2.5">
+            <div>
+              <label className="block text-[10.5px] font-medium text-[var(--fg-subtle)] mb-1">Model Name</label>
               <input
                 type="text"
                 placeholder="e.g. gemini-2.0-flash-exp"
@@ -538,39 +564,40 @@ export function SettingsCard({ value, onChange }: { value: AppSettings | null; o
                 className={field}
               />
             </div>
-            <div>
-              <label className="block text-[10px] text-[var(--fg-subtle)] mb-0.5">RPM Limit</label>
-              <input
-                type="number"
-                min={1}
-                max={1000}
-                value={newRpm}
-                onChange={(e) => setNewRpm(Math.max(1, +e.target.value || 15))}
-                className={field}
-              />
-            </div>
-            <div>
-              <label className="block text-[10px] text-[var(--fg-subtle)] mb-0.5">RPD Limit</label>
-              <input
-                type="number"
-                min={1}
-                max={100000}
-                value={newRpd}
-                onChange={(e) => setNewRpd(Math.max(1, +e.target.value || 500))}
-                className={field}
-              />
-            </div>
-          </div>
 
-          <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2 pt-1">
-            <div className="flex items-center gap-2">
-              <label className="text-[10.5px] text-[var(--fg-subtle)] whitespace-nowrap">Initial Priority:</label>
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <label className="block text-[10.5px] font-medium text-[var(--fg-subtle)] mb-1">RPM Limit</label>
+                <input
+                  type="number"
+                  min={1}
+                  max={1000}
+                  value={newRpm}
+                  onChange={(e) => setNewRpm(Math.max(1, +e.target.value || 15))}
+                  className={field}
+                />
+              </div>
+              <div>
+                <label className="block text-[10.5px] font-medium text-[var(--fg-subtle)] mb-1">RPD Limit</label>
+                <input
+                  type="number"
+                  min={1}
+                  max={100000}
+                  value={newRpd}
+                  onChange={(e) => setNewRpd(Math.max(1, +e.target.value || 500))}
+                  className={field}
+                />
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-[10.5px] font-medium text-[var(--fg-subtle)] mb-1">Initial Priority</label>
               <select
                 value={newPriority ?? ""}
                 onChange={(e) => setNewPriority(e.target.value === "" ? null : Number(e.target.value))}
-                className="h-7.5 rounded-md border border-[var(--border)] bg-[var(--surface-2)] px-2 font-mono text-[11px] text-[var(--fg)] focus:border-[var(--accent)] focus:outline-none"
+                className={field}
               >
-                <option value="">Unset (Fallback)</option>
+                <option value="">Unset (No Priority / Fallback)</option>
                 {Array.from({ length: totalPriorities + 1 }, (_, i) => i + 1).map((p) => {
                   const takenBy = models.find((x) => x.priority === p);
                   return (
@@ -581,14 +608,14 @@ export function SettingsCard({ value, onChange }: { value: AppSettings | null; o
                 })}
               </select>
             </div>
-
-            <Button variant="secondary" size="xs" onClick={handleAddModel}>
-              <IconPlus size={12} className="mr-1" />
-              Add Model to Pool
-            </Button>
           </div>
 
-          {addError && <div className="text-[11px] text-[var(--danger)]">{addError}</div>}
+          {addError && <div className="text-[11px] text-[var(--danger)] font-medium">{addError}</div>}
+
+          <Button variant="secondary" size="sm" className="w-full justify-center mt-1" onClick={handleAddModel}>
+            <IconPlus size={13} className="mr-1.5" />
+            Add Model to Pool
+          </Button>
         </div>
       </div>
 

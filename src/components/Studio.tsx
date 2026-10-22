@@ -565,6 +565,7 @@ function Workspace() {
         open={keysDrawer}
         title="Gemini API Keys & Load Balancer"
         subtitle="Model-first LRU round-robin across unlimited keys"
+        width="lg"
         onClose={() => setKeysDrawer(false)}
       >
         <KeysCard
@@ -612,7 +613,8 @@ function Workspace() {
       <DrawerModal
         open={settingsDrawer}
         title="Engine Settings"
-        subtitle="Chunk planning, model preference & simulation behavior"
+        subtitle="Chunk planning, model priority & failover pipeline"
+        width="lg"
         onClose={() => setSettingsDrawer(false)}
       >
         <SettingsCard value={settings} onChange={setSettings} />
