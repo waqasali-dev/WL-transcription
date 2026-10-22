@@ -3,7 +3,12 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { fmtClock, plural, resolution } from "@/lib/format";
 import { playbackRates, wordMatches } from "@/lib/search";
 import { copyTranscript, EXPORT_LABELS, exportJob } from "@/lib/export";
-import type { JobDetail, TranscriptDoc, VideoObservation } from "@/lib/types";
+import type { JobDetail, Sentence, TranscriptDoc, VideoObservation, Word } from "@/lib/types";
+
+const EMPTY_WORDS: Word[] = [];
+const EMPTY_SENTENCES: Sentence[] = [];
+const EMPTY_OBSERVATIONS: VideoObservation[] = [];
+
 import { Badge, Button, IconButton, Input, Segmented, Spinner, Tip, toast } from "./ui";
 import {
   IconArrowDown,
@@ -82,10 +87,10 @@ export function TranscriptWorkspace({ job, registerShortcuts, onTranscriptEdited
   const [muted, setMuted] = useState(false);
 
   const doc = job.transcript;
-  const words = doc?.words ?? [];
-  const sentences = doc?.sentences ?? [];
+  const words = doc?.words ?? EMPTY_WORDS;
+  const sentences = doc?.sentences ?? EMPTY_SENTENCES;
   const video = doc?.video;
-  const observations = video?.observations ?? [];
+  const observations = video?.observations ?? EMPTY_OBSERVATIONS;
   const duration = job.durationSec ?? 0;
   const frame = 0.02; // 20 ms CTC frame resolution
   const isVideo = job.mediaKind === "video";
@@ -226,7 +231,7 @@ export function TranscriptWorkspace({ job, registerShortcuts, onTranscriptEdited
   const toggle = useCallback(() => {
     const m = mediaRef.current;
     if (!m) return;
-    if (m.paused) void m.play();
+    if (m.paused) void m.play().catch(() => {});
     else m.pause();
   }, []);
 
@@ -236,7 +241,7 @@ export function TranscriptWorkspace({ job, registerShortcuts, onTranscriptEdited
       if (!m) return;
       m.currentTime = Math.max(0, Math.min(duration || Infinity, sec));
       setTime(m.currentTime);
-      if (autoplay) void m.play();
+      if (autoplay) void m.play().catch(() => {});
     },
     [duration]
   );
@@ -309,26 +314,36 @@ export function TranscriptWorkspace({ job, registerShortcuts, onTranscriptEdited
   }, []);
 
 
-  const api = useMemo<ShortcutApi>(
-    () => ({
-      toggle,
-      seek: seekDelta,
-      seekAbsolute: seekTo,
-      nudge,
-      prevSentence: () => stepSentence(-1),
-      nextSentence: () => stepSentence(1),
-      rate: changeRate,
-      setLoop,
-      setView,
-      focusSearch,
-    }),
-    [toggle, seekDelta, seekTo, nudge, stepSentence, changeRate, setLoop, focusSearch]
-  );
+  // ── Stable Shortcut API Ref to prevent parent re-renders ─────────────────
+  const transportRef = useRef<ShortcutApi>({
+    toggle: () => {},
+    seek: () => {},
+    seekAbsolute: () => {},
+    nudge: () => {},
+    prevSentence: () => {},
+    nextSentence: () => {},
+    rate: () => {},
+    setLoop: () => {},
+    setView: () => {},
+    focusSearch: () => {},
+  });
+
+  // Always keep handlers fresh in the stable object reference
+  transportRef.current.toggle = toggle;
+  transportRef.current.seek = seekDelta;
+  transportRef.current.seekAbsolute = seekTo;
+  transportRef.current.nudge = nudge;
+  transportRef.current.prevSentence = () => stepSentence(-1);
+  transportRef.current.nextSentence = () => stepSentence(1);
+  transportRef.current.rate = changeRate;
+  transportRef.current.setLoop = setLoop;
+  transportRef.current.setView = setView;
+  transportRef.current.focusSearch = focusSearch;
 
   useEffect(() => {
-    registerShortcuts(api);
+    registerShortcuts(transportRef.current);
     return () => registerShortcuts(null);
-  }, [api, registerShortcuts]);
+  }, [registerShortcuts]);
 
   // ── Inline editing persistence ──────────────────────────────────────────
   const saveWordEdit = useCallback(

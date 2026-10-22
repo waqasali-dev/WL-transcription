@@ -66,6 +66,10 @@ function Workspace() {
   const [mobilePanel, setMobilePanel] = useState<"workspace" | "inspector">("workspace");
   const [transport, setTransport] = useState<ShortcutApi | null>(null);
 
+  const handleRegisterShortcuts = useCallback((api: ShortcutApi | null) => {
+    setTransport((prev) => (prev === api ? prev : api));
+  }, []);
+
   const loadKeysAndSettings = useCallback(async () => {
     const [s, k] = await Promise.all([
       fetch("/api/settings", { cache: "no-store" }),
@@ -516,7 +520,7 @@ function Workspace() {
               <div className={mobilePanel === "workspace" ? "" : "hidden xl:block"}>
                 <TranscriptWorkspace
                   job={detail}
-                  registerShortcuts={setTransport}
+                  registerShortcuts={handleRegisterShortcuts}
                   onTranscriptEdited={(nextDoc) => updateTranscriptOptimistic(nextDoc)}
                 />
               </div>

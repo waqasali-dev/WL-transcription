@@ -40,6 +40,8 @@ export function useJobStream(): JobStream {
   const followRef = useRef(true);
   const visibleRef = useRef(true);
   const selectedRef = useRef<string | null>(null);
+  const jobsRef = useRef<JobSummary[]>([]);
+  jobsRef.current = jobs;
   const debounceTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
@@ -80,7 +82,23 @@ export function useJobStream(): JobStream {
       if (!res.ok) throw new Error(`Job list failed (${res.status})`);
       const data = await res.json();
       const list: JobSummary[] = data.jobs ?? [];
-      setJobs(list);
+      setJobs((prev) => {
+        if (
+          prev.length === list.length &&
+          prev.every(
+            (p, i) =>
+              p.id === list[i]?.id &&
+              p.status === list[i]?.status &&
+              p.stage === list[i]?.stage &&
+              p.progress === list[i]?.progress &&
+              p.wordCount === list[i]?.wordCount &&
+              p.completedAt === list[i]?.completedAt
+          )
+        ) {
+          return prev;
+        }
+        return list;
+      });
       setQueueRunning(Boolean(data.queue?.running));
       setKeyCount(data.keyCount ?? 0);
       setHealthyKeyCount(data.healthyKeyCount ?? data.keyCount ?? 0);
@@ -225,15 +243,15 @@ export function useJobStream(): JobStream {
       if (stopped) return;
       await refresh();
       if (stopped) return;
-      const busy = jobs.some((j) => j.status === "working" || j.status === "queued");
-      timer = setTimeout(loop, busy ? 2000 : 5000);
+      const busy = jobsRef.current.some((j) => j.status === "working" || j.status === "queued");
+      timer = setTimeout(loop, busy ? 2500 : 5000);
     };
-    timer = setTimeout(loop, 2000);
+    timer = setTimeout(loop, 2500);
     return () => {
       stopped = true;
       clearTimeout(timer);
     };
-  }, [jobs, refresh]);
+  }, [refresh]);
 
   const updateTranscriptOptimistic = useCallback((doc: TranscriptDoc, filename?: string) => {
     setDetail((prev) =>

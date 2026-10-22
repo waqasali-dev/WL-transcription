@@ -25,7 +25,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         {/* Applies the persisted theme before first paint to prevent a flash */}
         <script dangerouslySetInnerHTML={{ __html: THEME_BOOTSTRAP }} />
       </head>
-      <body className="antialiased">{children}</body>
+      <body className="antialiased" suppressHydrationWarning>{children}</body>
     </html>
   );
 }
