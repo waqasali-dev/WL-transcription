@@ -4,8 +4,10 @@ import { fmtClock, plural, resolution } from "@/lib/format";
 import { playbackRates, wordMatches } from "@/lib/search";
 import { copyTranscript, EXPORT_LABELS, exportJob } from "@/lib/export";
 import type { JobDetail, TranscriptDoc, VideoObservation } from "@/lib/types";
-import { Badge, Button, IconButton, Input, Segmented, Spinner, Tip } from "./ui";
+import { Badge, Button, IconButton, Input, Segmented, Spinner, Tip, toast } from "./ui";
 import {
+  IconArrowDown,
+  IconArrowUp,
   IconCheck,
   IconCopy,
   IconDownload,
@@ -24,6 +26,7 @@ import {
   IconWarn,
   IconX,
 } from "./icons";
+
 
 
 export type ViewMode = "sync" | "speech" | "visual";
@@ -420,6 +423,7 @@ export function TranscriptWorkspace({ job, registerShortcuts, onTranscriptEdited
     if (!doc) return;
     const ok = await copyTranscript(doc, "timecoded");
     setCopied(ok);
+    if (ok) toast("Transcript copied to clipboard", "success");
     setTimeout(() => setCopied(false), 1600);
   }, [doc]);
 
@@ -767,10 +771,33 @@ export function TranscriptWorkspace({ job, registerShortcuts, onTranscriptEdited
               )}
             </div>
             {query && (
-              <Badge tone={hitIndices.size ? "accent" : "danger"}>
-                {hitIndices.size}
-              </Badge>
+              <div className="flex items-center gap-1">
+                <Badge tone={hitIndices.size ? "accent" : "danger"}>
+                  {hitIndices.size} {hitIndices.size === 1 ? "match" : "matches"}
+                </Badge>
+                {hitIndices.size > 0 && (
+                  <div className="flex items-center rounded-md border border-[var(--border)] bg-[var(--surface-2)]">
+                    <button
+                      type="button"
+                      onClick={() => jumpToHit(-1)}
+                      className="flex h-6 w-6 items-center justify-center text-[var(--fg-muted)] hover:text-[var(--fg)] transition-colors"
+                      title="Previous match (Shift+Enter)"
+                    >
+                      <IconArrowUp size={11} />
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => jumpToHit(1)}
+                      className="flex h-6 w-6 items-center justify-center text-[var(--fg-muted)] hover:text-[var(--fg)] transition-colors"
+                      title="Next match (Enter)"
+                    >
+                      <IconArrowDown size={11} />
+                    </button>
+                  </div>
+                )}
+              </div>
             )}
+
           </div>
         </div>
       </div>
@@ -858,9 +885,13 @@ export function TranscriptWorkspace({ job, registerShortcuts, onTranscriptEdited
                       key={e.id}
                       type="button"
                       onClick={() => {
-                        if (doc) exportJob(e.id, job, doc);
+                        if (doc) {
+                          exportJob(e.id, job, doc);
+                          toast(`Exported ${e.label} (${e.ext})`, "success");
+                        }
                         setShowExport(false);
                       }}
+
                       className="flex w-full items-center justify-between gap-2 rounded-lg px-2.5 py-1.5 text-left transition-colors hover:bg-[var(--surface-2)]"
                     >
                       <div className="min-w-0">
