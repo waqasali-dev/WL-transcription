@@ -5,6 +5,7 @@ export type StageKey =
   | "chunking"
   | "transcription"
   | "alignment"
+  | "video"
   | "assembly"
   | "persist";
 
@@ -32,12 +33,17 @@ export const STAGES: { key: StageKey; label: string; blurb: string }[] = [
   {
     key: "transcription",
     label: "Gemini Transcription",
-    blurb: "Verbatim word JSON · multi-key rotation · coverage gate",
+    blurb: "Verbatim text · multi-key rotation · acoustic coverage gate",
   },
   {
     key: "alignment",
-    label: "Physical Alignment",
-    blurb: "Robust drift/scale fit → monotone DP → interpolate → durations",
+    label: "Acoustic Forced Alignment",
+    blurb: "wav2vec2 CTC Viterbi · letter-level timing · waveform edge refinement",
+  },
+  {
+    key: "video",
+    label: "Synchronized Video Analysis",
+    blurb: "30 s sections · 5 s observations · 1 s visual context overlap",
   },
   {
     key: "assembly",
@@ -53,13 +59,15 @@ export const STAGES: { key: StageKey; label: string; blurb: string }[] = [
 
 export interface Word {
   word: string;
+  /** acoustic start of the first letter (seconds) */
   start: number;
+  /** gapless visual end = next word's start */
   end: number;
   pauseAfterMs: number;
-  /** true when the start was snapped to a measured acoustic onset */
-  anchored?: boolean;
-  /** the raw model timestamp before physical correction (diagnostics) */
-  aiStart?: number;
+  /** when the voice actually stopped (energy decay), before gapless bridging */
+  spokenEnd?: number;
+  /** mean acoustic-model posterior of the word's letters (0–1) */
+  confidence?: number;
 }
 
 export interface Sentence {
@@ -91,17 +99,76 @@ export interface AlignmentStats {
   interpolated: number;
   total: number;
   collisionsFixed: number;
-  /** fitted offset between model time and physical waveform time */
-  driftMs?: number;
-  /** fitted stretch factor (model seconds → physical seconds) */
-  scale?: number;
-  medianResidualMs?: number;
-  p90ResidualMs?: number;
-  anchorRate?: number;
-  maxCorrectionMs?: number;
-  durationMedianMs?: number;
-  /** % of word starts that land inside a detected silence (lower is better) */
-  silenceLandingRate?: number;
+  method?: "ctc-forced" | "onset-dp";
+  avgConfidence?: number;
+  lowConfidence?: number;
+  refined?: number;
+}
+
+export interface VideoMeta {
+  width: number;
+  height: number;
+  fps: number;
+  codec: string;
+  hasAudio: boolean;
+}
+
+export interface VideoEventMarker {
+  /** Global timestamp in seconds (snapped to FFmpeg physical frame cuts when within tolerance) */
+  time: number;
+  /** What visibly happened at this moment (cut, gesture, graphic, UI change, camera move) */
+  what: string;
+  /** Exact acoustically-aligned word being spoken at `time`, if speech is active */
+  syncedWord?: string;
+}
+
+export interface VideoObservation {
+  index: number;
+  sectionIndex: number;
+  start: number;
+  end: number;
+  /** Inspected clip window with 1 s overlap padding around the 5 s core */
+  contextStart: number;
+  contextEnd: number;
+  description: string;
+  actions: string[];
+  subjects: string[];
+  visibleText: string[];
+  shot: string;
+  audioRelation: string;
+  speech: string;
+  combinedText: string;
+  confidence: number;
+  /** Exact FFmpeg pixel-detected scene cut timestamps within [start, end] */
+  sceneCuts?: number[];
+  /** Timestamped visual events inside this 5 s window, synced to exact spoken words */
+  events?: VideoEventMarker[];
+}
+
+export interface VideoSection {
+  index: number;
+  start: number;
+  end: number;
+  clipStart: number;
+  clipEnd: number;
+  model: string;
+  keyIndex: number | null;
+  /** Cohesive audiovisual narrative summarizing this 30 s section */
+  summary?: string;
+  observations: VideoObservation[];
+}
+
+export interface VideoTranscript {
+  complete: boolean;
+  simulated?: boolean;
+  sectionDurationSeconds: 30;
+  observationDurationSeconds: 5;
+  overlapSeconds: 1;
+  meta: VideoMeta;
+  /** Frame-accurate scene cuts across the full video measured via FFmpeg */
+  sceneCuts?: number[];
+  sections: VideoSection[];
+  observations: VideoObservation[];
 }
 
 export interface TranscriptDoc {
@@ -122,6 +189,7 @@ export interface TranscriptDoc {
   words: Word[];
   sentences: Sentence[];
   alignment: AlignmentStats | null;
+  video?: VideoTranscript;
 }
 
 export interface StageState {
@@ -135,7 +203,6 @@ export interface JobSettings {
   overlapSec: number;
   model: string;
   toleranceMs: number;
-  gapless: boolean;
 }
 
 export type JobStatus = "queued" | "working" | "completed" | "failed" | "canceled";
@@ -206,6 +273,8 @@ export interface JobSummary {
   createdAt: string;
   completedAt: string | null;
   mediaUrl: string | null;
+  mediaKind: "audio" | "video";
+  videoMeta: VideoMeta | null;
 }
 
 export interface JobDetail extends JobSummary {
@@ -231,21 +300,15 @@ export interface AppSettings {
   model: string;
   toleranceMs: number;
   allowSimulate: boolean;
-  /** stretch word ends through pauses for motion graphics */
-  gapless: boolean;
 }
 
-// Verified against GET /v1beta/models — the 2.5 series now returns 404 for new
-// projects, so the pool targets the live 3.x lineup plus rolling aliases.
 export const AVAILABLE_MODELS: { model: string; rpm: number; rpd: number }[] = [
-  { model: "gemini-3.8-flash", rpm: 5, rpd: 20 },
-  { model: "gemini-3.7-flash", rpm: 5, rpd: 20 },
   { model: "gemini-3.6-flash", rpm: 5, rpd: 20 },
   { model: "gemini-3.5-flash", rpm: 5, rpd: 20 },
   { model: "gemini-3.5-flash-lite", rpm: 15, rpd: 500 },
   { model: "gemini-3.1-flash-lite", rpm: 15, rpd: 500 },
-  { model: "gemini-flash-latest", rpm: 10, rpd: 250 },
-  { model: "gemini-flash-lite-latest", rpm: 15, rpd: 500 },
+  { model: "gemini-2.5-flash", rpm: 10, rpd: 100 },
+  { model: "gemini-2.5-flash-lite", rpm: 15, rpd: 500 },
 ];
 
 export function fmtClock(sec: number): string {

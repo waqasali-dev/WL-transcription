@@ -11,7 +11,7 @@ export async function POST(_req: Request, ctx: { params: Promise<{ id: string }>
   const [job] = await db.select().from(jobs).where(eq(jobs.id, id)).limit(1);
   if (!job) return Response.json({ error: "Job not found" }, { status: 404 });
   if (job.status === "working" || job.status === "queued") {
-    cancelJob(id);
+    await cancelJob(id);
   }
   return Response.json({ ok: true });
 }

@@ -21,8 +21,9 @@ interface ModelState {
   rpmLog: number[]; // timestamps of requests in the last 60s
   rpdUsed: number;
   rpdWindowStart: string;
-  minuteUntil: number; // 429-minute cooldown expiry (ms)
+  minuteUntil: number; // 429-minute / 5xx cooldown expiry (ms)
   dailyUntil: number; // 429-daily cooldown expiry (ms)
+  dead: boolean; // per-key model unavailability (404 / unsupported)
 }
 
 interface KeyState {
@@ -53,7 +54,14 @@ function modelState(k: KeyState, model: string, now = new Date()): ModelState {
   let m = k.models.get(model);
   const win = rpdWindowStart(now).toISOString();
   if (!m || m.rpdWindowStart !== win) {
-    m = { rpmLog: [], rpdUsed: 0, rpdWindowStart: win, minuteUntil: 0, dailyUntil: 0 };
+    m = {
+      rpmLog: m?.rpdWindowStart === win ? m.rpmLog : [],
+      rpdUsed: 0,
+      rpdWindowStart: win,
+      minuteUntil: 0,
+      dailyUntil: 0,
+      dead: m?.dead ?? false,
+    };
     k.models.set(model, m);
   }
   return m;
@@ -63,11 +71,18 @@ class KeyManager {
   keys: KeyState[] = [];
   private lastLoad = 0;
 
-  /** Discover env keys (api1..N, GEMINI_API_KEY, GEMINI_API_KEY_N) + DB keys */
+  /**
+   * Discover env keys (api1..N, GEMINI_API_KEY, GEMINI_API_KEY_N) + DB keys.
+   * Crucially preserves all live in-memory `models` RPM logs, cooldowns, and
+   * `lastUsedAt` timestamps across reloads so polling `/api/keys` or starting
+   * a new job never wipes active rate-limit state.
+   */
   async load(force = false): Promise<void> {
     const now = Date.now();
     if (!force && now - this.lastLoad < 10_000 && this.keys.length) return;
     this.lastLoad = now;
+
+    const prevById = new Map(this.keys.map((k) => [k.keyId, k]));
 
     const envData: Record<string, string> = { ...process.env } as Record<string, string>;
     const indexes = new Set<number>();
@@ -79,38 +94,61 @@ class KeyManager {
 
     const envKeys: KeyState[] = [];
     for (const i of [...indexes].sort((a, b) => a - b)) {
-      const raw = (i === 0 ? envData["GEMINI_API_KEY"] : envData[`api${i}`] || envData[`API${i}`] || envData[`GEMINI_API_KEY_${i}`] || "").trim();
+      const raw = (
+        i === 0
+          ? envData["GEMINI_API_KEY"]
+          : envData[`api${i}`] || envData[`API${i}`] || envData[`GEMINI_API_KEY_${i}`] || ""
+      ).trim();
       if (!raw) continue;
+      const kid = keyIdFor(raw);
+      const prev = prevById.get(kid);
       envKeys.push({
         idx: i,
         apiKey: raw,
-        keyId: keyIdFor(raw),
+        keyId: kid,
         from: (i === 0 ? "" : envData[`from${i}`] || envData[`FROM${i}`] || "").trim() || `account_${i}`,
-        project: (i === 0 ? "" : envData[`project${i}`] || envData[`PROJECT${i}`] || envData[`GEMINI_PROJECT_${i}`] || "").trim() || `project_${i}`,
+        project:
+          (i === 0 ? "" : envData[`project${i}`] || envData[`PROJECT${i}`] || envData[`GEMINI_PROJECT_${i}`] || "").trim() ||
+          `project_${i}`,
         source: "env",
         dbId: null,
-        disabledReason: null,
-        lastUsedAt: null,
-        models: new Map(),
+        disabledReason: prev?.disabledReason ?? null,
+        lastUsedAt: prev?.lastUsedAt ?? null,
+        models: prev?.models ?? new Map(),
       });
     }
 
     const dbKeys = await db.select().from(geminiKeys);
-    const dbMap = new Map(dbKeys.map((k) => [k.keyHash, k]));
-    const localKeys: KeyState[] = dbKeys.map((k) => ({
-      idx: k.idx,
-      apiKey: k.secret,
-      keyId: k.keyHash.slice(0, 16),
-      from: k.from || `account_${k.idx}`,
-      project: k.project || `project_${k.idx}`,
-      source: "local" as const,
-      dbId: k.id,
-      disabledReason: k.disabledReason,
-      lastUsedAt: k.lastUsedAt ? k.lastUsedAt.getTime() : null,
-      models: new Map(),
-    }));
+    const currentWin = rpdWindowStart(new Date(now)).toISOString();
+    const localKeys: KeyState[] = dbKeys.map((k) => {
+      const kid = k.keyHash.slice(0, 16);
+      const prev = prevById.get(kid);
+      const models = prev?.models ?? new Map<string, ModelState>();
+      // Hydrate persisted daily count on cold boot if window matches
+      if (!prev && k.rpdUsed > 0 && k.rpdWindowStart === currentWin && AVAILABLE_MODELS.length > 0) {
+        models.set(AVAILABLE_MODELS[0].model, {
+          rpmLog: [],
+          rpdUsed: k.rpdUsed,
+          rpdWindowStart: currentWin,
+          minuteUntil: 0,
+          dailyUntil: 0,
+          dead: false,
+        });
+      }
+      return {
+        idx: k.idx,
+        apiKey: k.secret,
+        keyId: kid,
+        from: k.from || `account_${k.idx}`,
+        project: k.project || `project_${k.idx}`,
+        source: "local" as const,
+        dbId: k.id,
+        disabledReason: prev ? prev.disabledReason : k.disabledReason,
+        lastUsedAt: prev?.lastUsedAt ?? (k.lastUsedAt ? k.lastUsedAt.getTime() : null),
+        models,
+      };
+    });
 
-    // merge: env first, then local (dedupe by key hash)
     const seen = new Set<string>();
     const merged: KeyState[] = [];
     for (const k of [...envKeys, ...localKeys]) {
@@ -126,43 +164,81 @@ class KeyManager {
     return this.keys.length;
   }
 
-  /** Atomic slot reservation — claims RPM+RPD before dispatch */
+  healthyCount(): number {
+    return this.keys.filter((k) => !k.disabledReason).length;
+  }
+
+  /** Recommended worker concurrency based on active non-disabled keys. */
+  concurrencyHint(maxWorkers = 3): number {
+    const healthy = this.healthyCount();
+    if (healthy <= 1) return 1;
+    return Math.min(maxWorkers, healthy);
+  }
+
+  /**
+   * Atomic Model-First, Least-Recently-Used Round-Robin slot reservation.
+   * Tries the highest-priority model across ALL healthy keys (ordered by
+   * least-recently-used + lowest active RPM load) before falling back to the
+   * next model tier, maximizing quality and throughput across unlimited keys.
+   */
   pickAndReserve(opts: { preferredModel?: string; now?: number } = {}): { slot: KeySlot; usage: KeyModelUsage } | null {
     const now = opts.now ?? Date.now();
     const pool = this.modelPool(opts.preferredModel);
-    for (const key of this.keys) {
-      if (key.disabledReason) continue;
-      for (const { model, rpm, rpd } of pool) {
+    const activeKeys = this.keys.filter((k) => !k.disabledReason);
+    if (!activeKeys.length) return null;
+
+    for (const { model, rpm, rpd } of pool) {
+      const candidates: { key: KeyState; ms: ModelState }[] = [];
+      for (const key of activeKeys) {
         const ms = modelState(key, model);
+        if (ms.dead) continue;
         ms.rpmLog = ms.rpmLog.filter((t) => now - t < 60_000);
         if (ms.rpmLog.length >= rpm) continue;
         if (ms.rpdUsed >= rpd) continue;
         if (ms.minuteUntil > now || ms.dailyUntil > now) continue;
-        // reserve
-        ms.rpmLog.push(now);
-        ms.rpdUsed += 1;
-        key.lastUsedAt = now;
-        void this.persist(key);
-        return {
-          slot: {
-            idx: key.idx,
-            apiKey: key.apiKey,
-            keyId: key.keyId,
-            from: key.from,
-            project: key.project,
-            source: key.source,
-            dbId: key.dbId,
-            model,
-          },
-          usage: { model, rpmUsed: ms.rpmLog.length, rpmLimit: rpm, rpdUsed: ms.rpdUsed, rpdLimit: rpd, limited: false },
-        };
+        candidates.push({ key, ms });
       }
+      if (!candidates.length) continue;
+
+      // Pick least-recently-used key (tie-breaking on lowest RPM utilization)
+      candidates.sort((a, b) => {
+        const luA = a.key.lastUsedAt ?? 0;
+        const luB = b.key.lastUsedAt ?? 0;
+        if (luA !== luB) return luA - luB;
+        return a.ms.rpmLog.length - b.ms.rpmLog.length;
+      });
+
+      const { key, ms } = candidates[0];
+      ms.rpmLog.push(now);
+      ms.rpdUsed += 1;
+      key.lastUsedAt = now;
+      void this.persist(key);
+      return {
+        slot: {
+          idx: key.idx,
+          apiKey: key.apiKey,
+          keyId: key.keyId,
+          from: key.from,
+          project: key.project,
+          source: key.source,
+          dbId: key.dbId,
+          model,
+        },
+        usage: {
+          model,
+          rpmUsed: ms.rpmLog.length,
+          rpmLimit: rpm,
+          rpdUsed: ms.rpdUsed,
+          rpdLimit: rpd,
+          limited: false,
+        },
+      };
     }
     return null;
   }
 
   modelPool(preferredModel?: string): { model: string; rpm: number; rpd: number }[] {
-    const all = AVAILABLE_MODELS.filter((m) => !this.deadModels.has(m.model));
+    const all = [...AVAILABLE_MODELS];
     if (preferredModel && preferredModel !== "auto") {
       const pref = all.find((m) => m.model === preferredModel);
       if (pref) return [pref, ...all.filter((m) => m.model !== preferredModel)];
@@ -170,9 +246,12 @@ class KeyManager {
     return all;
   }
 
-  deadModels = new Set<string>();
-  markModelDead(model: string) {
-    this.deadModels.add(model);
+  /** Marks a model dead ONLY on the specific key where it returned 404/unsupported. */
+  markModelDeadOnKey(slot: KeySlot) {
+    const k = this.keys.find((x) => x.keyId === slot.keyId);
+    if (!k) return;
+    const ms = modelState(k, slot.model);
+    ms.dead = true;
   }
 
   markKeyDisabled(slot: KeySlot, reason: string) {
@@ -194,8 +273,6 @@ class KeyManager {
     }
   }
 
-  /** Short cooldown used after transient 5xx errors so rotation moves on
-   *  to the next key/model combo instead of hammering the hot model. */
   markModelCooldown(slot: KeySlot, ms: number) {
     const k = this.keys.find((x) => x.keyId === slot.keyId);
     if (!k) return;
@@ -203,18 +280,13 @@ class KeyManager {
     st.minuteUntil = Math.max(st.minuteUntil, Date.now() + ms);
   }
 
-  /**
-   * True when some key could yield a slot within `horizonMs`. RPM saturation
-   * and cooldowns count as hopeful (they roll off); disabled keys and
-   * RPD-exhausted models do not — in that case waiting cannot help.
-   */
   outlook(horizonMs = 120_000): boolean {
     const now = Date.now();
-    const models = AVAILABLE_MODELS.filter((m) => !this.deadModels.has(m.model));
     for (const k of this.keys) {
       if (k.disabledReason) continue;
-      for (const m of models) {
+      for (const m of AVAILABLE_MODELS) {
         const ms = modelState(k, m.model);
+        if (ms.dead) continue;
         if (ms.rpdUsed >= m.rpd) continue;
         if (ms.dailyUntil > now + horizonMs) continue;
         return true;
@@ -227,8 +299,8 @@ class KeyManager {
     const k = this.keys.find((x) => x.keyId === slot.keyId);
     if (!k) return;
     const ms = modelState(k, slot.model);
-    // return the RPM reservation
     ms.rpmLog.pop();
+    ms.rpdUsed = Math.max(0, ms.rpdUsed - 1);
   }
 
   private async persist(k: KeyState) {
@@ -268,7 +340,6 @@ class KeyManager {
       .returning();
     let row = inserted[0];
     if (!row) {
-      // raced a duplicate insert — fetch the existing row
       const [found] = await db.select().from(geminiKeys).where(eq(geminiKeys.keyHash, hash)).limit(1);
       if (found) {
         const ks: KeyState = {
@@ -306,7 +377,6 @@ class KeyManager {
     return k;
   }
 
-  /** Bulk-add many keys at once (the rotation pool can grow without bound). */
   async addKeys(items: { key: string; from: string; project: string }[]): Promise<{
     added: number;
     duplicates: number;
@@ -314,15 +384,6 @@ class KeyManager {
     total: number;
   }> {
     await this.load();
-    return this.addKeysLoaded(items);
-  }
-
-  private async addKeysLoaded(items: { key: string; from: string; project: string }[]): Promise<{
-    added: number;
-    duplicates: number;
-    invalid: number;
-    total: number;
-  }> {
     let added = 0;
     let duplicates = 0;
     let invalid = 0;
@@ -372,7 +433,7 @@ class KeyManager {
       from: k.from,
       project: k.project,
       source: k.source,
-      models: AVAILABLE_MODELS.filter((m) => !this.deadModels.has(m.model)).map((m) => {
+      models: AVAILABLE_MODELS.map((m) => {
         const ms = modelState(k, m.model);
         const rpmUsed = ms.rpmLog.filter((t) => Date.now() - t < 60_000).length;
         const until = Math.max(ms.minuteUntil, ms.dailyUntil);
@@ -382,7 +443,7 @@ class KeyManager {
           rpmLimit: m.rpm,
           rpdUsed: ms.rpdUsed,
           rpdLimit: m.rpd,
-          limited: until > Date.now(),
+          limited: ms.dead || until > Date.now(),
           limitedUntil: until > Date.now() ? new Date(until).toISOString() : undefined,
         };
       }),

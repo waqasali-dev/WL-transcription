@@ -15,20 +15,27 @@ export function round3(n: number): number {
 function run(
   cmd: string,
   args: string[],
-  opts: { timeoutMs?: number; input?: Buffer } = {}
+  opts: { timeoutMs?: number; input?: Buffer; signal?: AbortSignal } = {}
 ): Promise<{ stdout: Buffer; stderr: string }> {
   return new Promise((resolve, reject) => {
-    const child = (execFile as any)(cmd, args, {
-      // NOTE: `encoding: "buffer"` is essential — without it execFile returns
-      // UTF-8 *strings*, which corrupts binary PCM and made .buffer undefined
-      // (MP3 decoding failed while WAV survived via the fallback parser).
-      encoding: "buffer",
-      maxBuffer: 1024 * 1024 * 256,
-      timeout: opts.timeoutMs ?? 180_000,
-    } as any, (err: Error | null, stdout: Buffer, stderr: Buffer) => {
-      if (err) reject(err);
-      else resolve({ stdout, stderr: stderr.toString() });
-    });
+    const child = (execFile as any)(
+      cmd,
+      args,
+      {
+        encoding: "buffer",
+        maxBuffer: 1024 * 1024 * 256,
+        timeout: opts.timeoutMs ?? 180_000,
+        signal: opts.signal,
+      } as any,
+      (err: Error | null, stdout: Buffer, stderr: Buffer) => {
+        if (opts.signal?.aborted) {
+          reject(new Error("cancelled"));
+          return;
+        }
+        if (err) reject(err);
+        else resolve({ stdout, stderr: stderr ? stderr.toString() : "" });
+      }
+    );
     if (opts.input && child.stdin) {
       child.stdin.write(opts.input);
       child.stdin.end();
@@ -37,23 +44,23 @@ function run(
 }
 
 // ── Step 1: Exact duration measurement ────────────────────────────────────────
-export async function probeDuration(filePath: string): Promise<number> {
+export async function probeDuration(filePath: string, signal?: AbortSignal): Promise<number> {
   try {
-    const { stdout } = await run(FFPROBE, [
-      "-v",
-      "error",
-      "-show_entries",
-      "format=duration",
-      "-of",
-      "default=noprint_wrappers=1:nokey=1",
-      filePath,
-    ]);
+    const { stdout } = await run(
+      FFPROBE,
+      ["-v", "error", "-show_entries", "format=duration", "-of", "default=noprint_wrappers=1:nokey=1", filePath],
+      { signal }
+    );
     const duration = parseFloat(stdout.toString().trim());
-    if (Number.isFinite(duration)) return round3(duration);
-  } catch {
-    /* fall through to ffmpeg header inspection */
+    if (Number.isFinite(duration) && duration > 0) return round3(duration);
+  } catch (e: any) {
+    if (signal?.aborted) throw new Error("cancelled");
   }
-  const { stderr } = await run(FFMPEG, ["-hide_banner", "-i", filePath], { timeoutMs: 60_000 });
+  const { stderr } = await run(FFMPEG, ["-hide_banner", "-i", filePath], { timeoutMs: 60_000, signal }).catch((err: any) => {
+    // ffmpeg -i without output exits non-zero intentionally while printing headers to stderr
+    if (signal?.aborted) throw new Error("cancelled");
+    return { stderr: String(err?.stderr?.toString?.() || err?.message || "") };
+  });
   const m = stderr.match(/Duration:\s*(\d+):(\d+):(\d+(?:\.\d+)?)/);
   if (m) {
     const h = parseInt(m[1], 10);
@@ -61,7 +68,6 @@ export async function probeDuration(filePath: string): Promise<number> {
     const s = parseFloat(m[3]);
     return round3(h * 3600 + mi * 60 + s);
   }
-  // Final fallback: parse WAV header directly
   const wav = parseWavHeader(filePath);
   if (wav) return round3(wav.samples.length / wav.sampleRate);
   throw new Error("Could not determine media duration");
@@ -70,19 +76,13 @@ export async function probeDuration(filePath: string): Promise<number> {
 // ── Step 1: Silence boundary detection (silencedetect) ───────────────────────
 export async function detectSilences(
   filePath: string,
-  { noiseDb = -35, minSilenceSec = 0.35 } = {}
+  { noiseDb = -35, minSilenceSec = 0.35, signal }: { noiseDb?: number; minSilenceSec?: number; signal?: AbortSignal } = {}
 ): Promise<Silence[]> {
-  const { stderr } = await run(FFMPEG, [
-    "-hide_banner",
-    "-nostats",
-    "-i",
-    filePath,
-    "-af",
-    `silencedetect=noise=${noiseDb}dB:d=${minSilenceSec}`,
-    "-f",
-    "null",
-    "-",
-  ]);
+  const { stderr } = await run(
+    FFMPEG,
+    ["-hide_banner", "-nostats", "-i", filePath, "-af", `silencedetect=noise=${noiseDb}dB:d=${minSilenceSec}`, "-f", "null", "-"],
+    { signal }
+  );
   const silences: Silence[] = [];
   let currentStart: number | null = null;
   for (const line of stderr.split(/\r?\n/)) {
@@ -100,6 +100,22 @@ export async function detectSilences(
   return silences;
 }
 
+// ── Adaptive silence threshold ───────────────────────────────────────────────
+export function adaptiveNoiseDb(samples: Int16Array, sampleRate = 16000): number {
+  const hop = Math.round(sampleRate * 0.05);
+  const levels: number[] = [];
+  for (let i = 0; i + hop <= samples.length; i += hop) {
+    let sum = 0;
+    for (let j = i; j < i + hop; j++) sum += samples[j] * samples[j];
+    const rms = Math.sqrt(sum / hop) / 32768;
+    levels.push(20 * Math.log10(Math.max(rms, 1e-6)));
+  }
+  if (!levels.length) return -35;
+  levels.sort((a, b) => a - b);
+  const p15 = levels[Math.floor(levels.length * 0.15)];
+  return Math.round(Math.min(-22, Math.max(-55, p15 + 5)) * 10) / 10;
+}
+
 // ── Step 1: Active speech intervals ──────────────────────────────────────────
 export function speechIntervals(silences: Silence[], duration: number) {
   const intervals: Silence[] = [];
@@ -115,7 +131,7 @@ export function speechIntervals(silences: Silence[], duration: number) {
 // ── Pure-JS WAV parsing (fallback if the ffmpeg binary is unavailable) ──────
 export function parseWavHeader(filePath: string): { samples: Float32Array; sampleRate: number } | null {
   try {
-    const buf = fs.readFileSync(filePath);
+    const buf = fs.readFileSync(/*turbopackIgnore: true*/ filePath);
     if (buf.length < 44 || buf.toString("ascii", 0, 4) !== "RIFF") return null;
     const sampleRate = buf.readUInt32LE(24);
     const bitsPerSample = buf.readUInt16LE(34);
@@ -140,17 +156,14 @@ export function parseWavHeader(filePath: string): { samples: Float32Array; sampl
       const n = Math.floor(total / 2 / channels);
       samples = new Float32Array(n);
       for (let i = 0; i < n; i++) {
-        const v = buf.readInt16LE(dataStart + (i * channels) * 2) / 32768;
-        // mono downmix: average channels
-        samples[i] = v;
+        samples[i] = buf.readInt16LE(dataStart + i * channels * 2) / 32768;
       }
     } else if (bitsPerSample === 32) {
-      // IEEE float (WAVE-tagged fmt chunk) vs 32-bit integer
       const isFloat = buf.includes(Buffer.from("WAVE"));
       const n = Math.floor(total / 4 / channels);
       samples = new Float32Array(n);
       for (let i = 0; i < n; i++) {
-        const o = dataStart + (i * channels) * 4;
+        const o = dataStart + i * channels * 4;
         samples[i] = isFloat ? buf.readFloatLE(o) : buf.readInt32LE(o) / 2147483648;
       }
     } else {
@@ -177,31 +190,30 @@ function resampleLinear(src: Float32Array, fromHz: number, toHz: number): Float3
   return out;
 }
 
-// ── Step 2: Decode to 16 kHz mono 16-bit PCM (ffmpeg pipe, WAV fallback) ────
-export async function decodePcm16(filePath: string, sampleRate = 16000): Promise<Int16Array> {
+// ── Step 2: Decode to 16 kHz mono 16-bit PCM (single pass per job!) ─────────
+export async function decodePcm16(filePath: string, sampleRate = 16000, signal?: AbortSignal): Promise<Int16Array> {
   let ffmpegError: Error | null = null;
   try {
     const { stdout } = await run(
       FFMPEG,
       ["-v", "error", "-i", filePath, "-ac", "1", "-ar", String(sampleRate), "-f", "s16le", "pipe:1"],
-      { timeoutMs: 300_000 }
+      { timeoutMs: 300_000, signal }
     );
-    // alignment-safe copy: Int16Array requires a 2-byte-aligned offset, and a
-    // pooled Buffer's byteOffset isn't guaranteed to be one — copy first.
-    const bytes = Buffer.from(stdout.buffer.slice(stdout.byteOffset, stdout.byteOffset + Math.floor(stdout.length / 2) * 2));
-    const out = new Int16Array(bytes.length / 2);
+    const evenBytes = Math.floor(stdout.length / 2) * 2;
+    const bytes = Buffer.from(stdout.buffer, stdout.byteOffset, evenBytes);
+    const out = new Int16Array(evenBytes / 2);
     for (let i = 0; i < out.length; i++) out[i] = bytes.readInt16LE(i * 2);
-    if (out.length < sampleRate / 2) throw new Error(`ffmpeg decoded only ${out.length} samples`);
+    if (out.length < sampleRate / 4) throw new Error(`ffmpeg decoded only ${out.length} samples`);
     return out;
   } catch (err) {
+    if (signal?.aborted) throw new Error("cancelled");
     ffmpegError = err instanceof Error ? err : new Error(String(err));
   }
-  // ffmpeg failed — try the pure-JS WAV parser as a last resort
   const wav = parseWavHeader(filePath);
   if (!wav) {
     throw new Error(
       `Could not decode audio — ffmpeg said: ${ffmpegError?.message?.slice(0, 220) || "unknown error"}. ` +
-        `Supported inputs: mp3, wav, m4a, mp4, ogg, flac, aac, webm, aiff.`
+        `Supported inputs: mp3, wav, m4a, mp4, mov, mkv, ogg, flac, aac, webm, aiff.`
     );
   }
   const res = resampleLinear(wav.samples, wav.sampleRate, sampleRate);
@@ -212,8 +224,33 @@ export async function decodePcm16(filePath: string, sampleRate = 16000): Promise
   return out;
 }
 
+/**
+ * Converts Int16 PCM to Float32 [-1, 1] with gentle automatic gain normalization
+ * on very quiet recordings (e.g. distant room mics < -18 dBFS peak), capped at +14 dB
+ * so noise floors in silent files are never exploded into fake speech.
+ */
+export function pcmToNormalizedFloat32(pcm: Int16Array): { samples: Float32Array; gainDb: number } {
+  const out = new Float32Array(pcm.length);
+  let peak = 0;
+  for (let i = 0; i < pcm.length; i++) {
+    const v = pcm[i] / 32768;
+    out[i] = v;
+    const av = v < 0 ? -v : v;
+    if (av > peak) peak = av;
+  }
+  // If signal has audible content (> -50 dBFS) but is quiet (< 0.45 peak), normalize toward 0.85 (max 5x = +14 dB)
+  let gain = 1;
+  if (peak > 0.003 && peak < 0.45) {
+    gain = Math.min(5, 0.85 / peak);
+    for (let i = 0; i < out.length; i++) {
+      out[i] = Math.max(-1, Math.min(1, out[i] * gain));
+    }
+  }
+  return { samples: out, gainDb: round3(20 * Math.log10(gain)) };
+}
+
 // ── Downsampled RMS energy profile for the UI waveform ───────────────────────
-export function computeEnergyBins(samples: Int16Array, sampleRate: number, bins = 512) {
+export function computeEnergyBins(samples: Int16Array, _sampleRate: number, bins = 600) {
   const binSize = Math.max(1, Math.floor(samples.length / bins));
   const out: number[] = [];
   let peak = 0;
@@ -229,40 +266,44 @@ export function computeEnergyBins(samples: Int16Array, sampleRate: number, bins 
   if (peak > 0) {
     for (let i = 0; i < out.length; i++) out[i] = out[i] / peak;
   }
-  return { bins: out.map((v) => round3(v)), peak };
+  return { bins: out.map((v) => round3(v)), peak: round3(peak) };
 }
 
 // ── Step 2: Physical waveform acoustic onset detection ───────────────────────
-// 16 kHz mono · 10 ms RMS window · 5 ms hop · ODF = max(0, E_t − E_t−1)
-// Adaptive threshold = max(2 × P75(±200 ms context), 0.003) · 80 ms min spacing
 export function detectOnsetsFromSamples(
   samples: Int16Array,
   sampleRate: number,
   { windowMs = 10, hopMs = 5, minSpacingMs = 80 } = {}
 ): number[] {
-  const windowSize = Math.round((sampleRate * windowMs) / 1000); // 160 samples
-  const hopSize = Math.round((sampleRate * hopMs) / 1000); // 80 samples
-  const minSpacingFrames = Math.round(minSpacingMs / hopMs); // 16 frames
+  const windowSize = Math.round((sampleRate * windowMs) / 1000);
+  const hopSize = Math.round((sampleRate * hopMs) / 1000);
+  const minSpacingFrames = Math.round(minSpacingMs / hopMs);
 
-  // Short-time RMS energy
   const energy: number[] = [];
+  let peakEnergy = 0;
   for (let i = 0; i + windowSize <= samples.length; i += hopSize) {
     let sum = 0;
     for (let j = i; j < i + windowSize; j++) sum += samples[j] * samples[j];
-    energy.push(Math.sqrt(sum / windowSize) / 32768);
+    const rms = Math.sqrt(sum / windowSize) / 32768;
+    energy.push(rms);
+    if (rms > peakEnergy) peakEnergy = rms;
   }
 
-  // Onset detection function (positive energy rise only)
-  const odf = new Array(energy.length).fill(0);
+  // Scale quiet recordings cleanly so onset floor adapts to room mic gain
+  const gainScale = peakEnergy > 0.003 && peakEnergy < 0.25 ? Math.min(5, 0.4 / peakEnergy) : 1;
+  if (gainScale > 1) {
+    for (let i = 0; i < energy.length; i++) energy[i] *= gainScale;
+  }
+
+  const odf = new Float64Array(energy.length);
   for (let i = 1; i < energy.length; i++) {
     odf[i] = Math.max(0, energy[i] - energy[i - 1]);
   }
 
-  // Adaptive peak picking with local context threshold
   const contextFrames = Math.round(200 / hopMs);
   const onsets: number[] = [];
   for (let i = 2; i < odf.length - 1; i++) {
-    if (odf[i] < odf[i - 1] || odf[i] < odf[i + 1]) continue; // local peak only
+    if (odf[i] < odf[i - 1] || odf[i] < odf[i + 1]) continue;
 
     const lo = Math.max(0, i - contextFrames);
     const hi = Math.min(odf.length, i + contextFrames + 1);
@@ -287,37 +328,104 @@ export async function detectOnsets(filePath: string): Promise<number[]> {
   return detectOnsetsFromSamples(samples, 16000);
 }
 
-// ── Chunk slicing to a temp mono 16 kHz MP3 ──────────────────────────────────
+// ── Chunk slicing to a temp mono 16 kHz MP3 (with automatic loudnorm / gain) ─
 export async function sliceToMp3(
   src: string,
   startSec: number,
   endSec: number,
-  outPath: string
+  outPath: string,
+  signal?: AbortSignal
 ): Promise<void> {
   fs.mkdirSync(path.dirname(outPath), { recursive: true });
-  await run(FFMPEG, [
-    "-y",
-    "-v",
-    "error",
-    "-ss",
-    String(Math.max(0, startSec)),
-    "-to",
-    String(Math.max(0, endSec)),
-    "-i",
-    src,
-    "-ac",
-    "1",
-    "-ar",
-    "16000",
-    "-c:a",
-    "libmp3lame",
-    "-b:a",
-    "96k",
-    outPath,
-  ]);
+  await run(
+    FFMPEG,
+    [
+      "-y",
+      "-v",
+      "error",
+      "-ss",
+      String(Math.max(0, startSec)),
+      "-to",
+      String(Math.max(0, endSec)),
+      "-i",
+      src,
+      "-ac",
+      "1",
+      "-ar",
+      "16000",
+      "-c:a",
+      "libmp3lame",
+      "-b:a",
+      "96k",
+      outPath,
+    ],
+    { signal }
+  );
 }
 
-// ── Full analysis bundle used by the runner ──────────────────────────────────
+/**
+ * Ensures any non-browser-native container/codec (.mkv, .avi, HEVC .mov, .aiff, .wma)
+ * has a fast browser-playable MP4/MP3 proxy so `<video>` / `<audio>` playback
+ * works across Chrome, Safari, Firefox, and Edge without black screens.
+ */
+export async function ensureBrowserPlayable(
+  filePath: string,
+  mediaKind: "audio" | "video",
+  videoCodec?: string,
+  signal?: AbortSignal
+): Promise<string> {
+  const ext = path.extname(filePath).toLowerCase();
+  if (mediaKind === "video") {
+    const webContainer = ext === ".mp4" || ext === ".webm";
+    const webCodec = !videoCodec || /^(h264|avc1|vp8|vp9|av1)$/i.test(videoCodec);
+    if (webContainer && webCodec) return filePath;
+    const proxyPath = path.join(path.dirname(/*turbopackIgnore: true*/ filePath), `${path.basename(filePath)}.web.mp4`);
+    if (fs.existsSync(/*turbopackIgnore: true*/ proxyPath)) return proxyPath;
+    await run(
+      FFMPEG,
+      [
+        "-y",
+        "-v",
+        "error",
+        "-i",
+        filePath,
+        "-vf",
+        "scale=trunc(iw/2)*2:trunc(ih/2)*2",
+        "-c:v",
+        "libx264",
+        "-preset",
+        "veryfast",
+        "-crf",
+        "23",
+        "-pix_fmt",
+        "yuv420p",
+        "-c:a",
+        "aac",
+        "-b:a",
+        "128k",
+        "-movflags",
+        "+faststart",
+        proxyPath,
+      ],
+      { timeoutMs: 300_000, signal }
+    );
+    return proxyPath;
+  }
+
+  // Audio: .aiff / .aif / .wma aren't supported in Chrome/Firefox HTMLAudioElement
+  if (ext === ".aiff" || ext === ".aif") {
+    const proxyPath = path.join(path.dirname(/*turbopackIgnore: true*/ filePath), `${path.basename(filePath)}.web.mp3`);
+    if (fs.existsSync(/*turbopackIgnore: true*/ proxyPath)) return proxyPath;
+    await run(
+      FFMPEG,
+      ["-y", "-v", "error", "-i", filePath, "-c:a", "libmp3lame", "-b:a", "192k", proxyPath],
+      { timeoutMs: 180_000, signal }
+    );
+    return proxyPath;
+  }
+  return filePath;
+}
+
 export interface AudioFeatures {
   durationSec: number;
   silences: Silence[];
@@ -331,8 +439,8 @@ export async function analyzeAudio(filePath: string): Promise<AudioFeatures> {
   const t0 = Date.now();
   const durationSec = await probeDuration(filePath);
   const samples = await decodePcm16(filePath, 16000);
-  const energy = computeEnergyBins(samples, 16000, 512);
-  const silences = await detectSilences(filePath);
+  const energy = computeEnergyBins(samples, 16000, 600);
+  const silences = await detectSilences(filePath, { noiseDb: adaptiveNoiseDb(samples) });
   const speech = speechIntervals(silences, durationSec);
   const onsets = detectOnsetsFromSamples(samples, 16000);
   return {

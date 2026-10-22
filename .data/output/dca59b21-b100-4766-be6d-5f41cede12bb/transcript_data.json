@@ -1,6 +1,6 @@
 {
-  "version": 3,
-  "generatedAt": "2026-10-18T17:13:24.279Z",
+  "version": 4,
+  "generatedAt": "2026-10-18T17:31:01.929Z",
   "audio": {
     "filename": "Microsoft Just Built a $6,000 AI Laptop - Meet the Surface Laptop Ultra.mp3",
     "fingerprint": null,
@@ -17,51 +17,68 @@
   "chunks": [
     {
       "index": 0,
-      "coreStart": 0,
+      "model": "gemini-3.6-flash",
       "coreEnd": 30,
-      "wordCount": 80,
       "coverage": 0.99,
-      "longestMissSec": 0,
-      "model": "gemini-3.6-flash"
+      "coreStart": 0,
+      "wordCount": 80,
+      "longestMissSec": 0
     },
     {
       "index": 1,
-      "coreStart": 30,
+      "model": "gemini-3.6-flash",
       "coreEnd": 60,
-      "wordCount": 98,
       "coverage": 1,
-      "longestMissSec": 0,
-      "model": "gemini-3.6-flash"
+      "coreStart": 30,
+      "wordCount": 98,
+      "longestMissSec": 0
     },
     {
       "index": 2,
-      "coreStart": 60,
+      "model": "gemini-3.5-flash-lite",
       "coreEnd": 90,
-      "wordCount": 79,
       "coverage": 0.99,
-      "longestMissSec": 0.156,
-      "model": "gemini-3.5-flash-lite"
+      "coreStart": 60,
+      "wordCount": 79,
+      "longestMissSec": 0.156
     },
     {
       "index": 3,
-      "coreStart": 90,
+      "model": "gemini-3.5-flash-lite",
       "coreEnd": 120,
-      "wordCount": 54,
       "coverage": 0.98,
-      "longestMissSec": 0,
-      "model": "gemini-3.5-flash-lite"
+      "coreStart": 90,
+      "wordCount": 54,
+      "longestMissSec": 0
     },
     {
       "index": 4,
-      "coreStart": 120,
+      "model": "gemini-3.5-flash-lite",
       "coreEnd": 131.605,
-      "wordCount": 25,
       "coverage": 1,
-      "longestMissSec": 0,
-      "model": "gemini-3.5-flash-lite"
+      "coreStart": 120,
+      "wordCount": 25,
+      "longestMissSec": 0
     }
   ],
-  "silences": [],
+  "silences": [
+    {
+      "start": 75.557,
+      "end": 75.937
+    },
+    {
+      "start": 101.102,
+      "end": 101.574
+    },
+    {
+      "start": 106.497,
+      "end": 106.953
+    },
+    {
+      "start": 128.473,
+      "end": 128.986
+    }
+  ],
   "onsets": [
     0.03,
     0.17,
@@ -1035,1797 +1052,2394 @@
   "words": [
     {
       "word": "Microsoft",
-      "start": 0.03,
-      "end": 0.505,
-      "pauseAfterMs": 0
+      "start": 0.17,
+      "end": 0.79,
+      "spokenEnd": 0.75,
+      "pauseAfterMs": 40,
+      "confidence": 0.75
     },
     {
       "word": "just",
-      "start": 0.505,
-      "end": 0.79,
-      "pauseAfterMs": 0
+      "start": 0.79,
+      "end": 1,
+      "spokenEnd": 0.97,
+      "pauseAfterMs": 30,
+      "confidence": 0.99
     },
     {
       "word": "built",
-      "start": 0.79,
-      "end": 1.025,
-      "pauseAfterMs": 0
+      "start": 1,
+      "end": 1.26,
+      "spokenEnd": 1.18,
+      "pauseAfterMs": 80,
+      "confidence": 0.99
     },
     {
       "word": "a",
-      "start": 1.025,
-      "end": 1.18,
-      "pauseAfterMs": 0
+      "start": 1.26,
+      "end": 1.46,
+      "spokenEnd": 1.3,
+      "pauseAfterMs": 160,
+      "confidence": 1
     },
     {
       "word": "Surface",
-      "start": 1.18,
-      "end": 1.59,
-      "pauseAfterMs": 0
+      "start": 1.46,
+      "end": 1.89,
+      "spokenEnd": 1.85,
+      "pauseAfterMs": 40,
+      "confidence": 0.98
     },
     {
       "word": "laptop",
-      "start": 1.59,
-      "end": 2.255,
-      "pauseAfterMs": 0
+      "start": 1.89,
+      "end": 2.44,
+      "spokenEnd": 2.36,
+      "pauseAfterMs": 80,
+      "confidence": 0.99
     },
     {
       "word": "that",
-      "start": 2.255,
-      "end": 2.45,
-      "pauseAfterMs": 0
+      "start": 2.44,
+      "end": 2.555,
+      "spokenEnd": 2.53,
+      "pauseAfterMs": 25,
+      "confidence": 1
     },
     {
       "word": "can",
-      "start": 2.45,
-      "end": 2.635,
-      "pauseAfterMs": 0
+      "start": 2.555,
+      "end": 2.74,
+      "spokenEnd": 2.69,
+      "pauseAfterMs": 50,
+      "confidence": 1
     },
     {
       "word": "cost",
-      "start": 2.635,
-      "end": 2.985,
-      "pauseAfterMs": 0
+      "start": 2.74,
+      "end": 3.07,
+      "spokenEnd": 2.97,
+      "pauseAfterMs": 100,
+      "confidence": 1
     },
     {
       "word": "almost",
-      "start": 2.985,
+      "start": 3.07,
       "end": 3.51,
-      "pauseAfterMs": 0
+      "spokenEnd": 3.39,
+      "pauseAfterMs": 120,
+      "confidence": 0.94
     },
     {
       "word": "six",
       "start": 3.51,
-      "end": 3.88,
-      "pauseAfterMs": 0
+      "end": 3.995,
+      "spokenEnd": 3.73,
+      "pauseAfterMs": 265,
+      "confidence": 0.97
     },
     {
       "word": "thousand",
-      "start": 3.88,
-      "end": 4.18,
-      "pauseAfterMs": 0
+      "start": 3.995,
+      "end": 4.6,
+      "spokenEnd": 4.59,
+      "pauseAfterMs": 10,
+      "confidence": 0.99
     },
     {
       "word": "dollars.",
-      "start": 4.18,
-      "end": 5.3,
-      "pauseAfterMs": 0
+      "start": 4.6,
+      "end": 6,
+      "spokenEnd": 5.09,
+      "pauseAfterMs": 910,
+      "confidence": 0.95
     },
     {
       "word": "And",
-      "start": 5.3,
-      "end": 5.475,
-      "pauseAfterMs": 0
+      "start": 6,
+      "end": 6.2,
+      "spokenEnd": 6.1,
+      "pauseAfterMs": 100,
+      "confidence": 0.95
     },
     {
       "word": "somehow,",
-      "start": 5.475,
-      "end": 6.02,
-      "pauseAfterMs": 0
-    },
-    {
-      "word": "the",
-      "start": 6.02,
-      "end": 6.245,
-      "pauseAfterMs": 0
-    },
-    {
-      "word": "price",
-      "start": 6.245,
-      "end": 6.615,
-      "pauseAfterMs": 0
-    },
-    {
-      "word": "isn't",
-      "start": 6.615,
-      "end": 6.95,
-      "pauseAfterMs": 0
-    },
-    {
-      "word": "even",
-      "start": 6.95,
+      "start": 6.2,
       "end": 7.125,
-      "pauseAfterMs": 0
+      "spokenEnd": 6.76,
+      "pauseAfterMs": 365,
+      "confidence": 0.98
     },
     {
       "word": "the",
       "start": 7.125,
-      "end": 7.43,
-      "pauseAfterMs": 0
+      "end": 7.34,
+      "spokenEnd": 7.23,
+      "pauseAfterMs": 110,
+      "confidence": 0.99
     },
     {
-      "word": "craziest",
-      "start": 7.43,
+      "word": "price",
+      "start": 7.34,
       "end": 7.805,
-      "pauseAfterMs": 0
+      "spokenEnd": 7.65,
+      "pauseAfterMs": 155,
+      "confidence": 0.96
     },
     {
-      "word": "part.",
+      "word": "isn't",
       "start": 7.805,
-      "end": 9.665,
-      "pauseAfterMs": 0
+      "end": 8.04,
+      "spokenEnd": 8.04,
+      "pauseAfterMs": 0,
+      "confidence": 0.94
     },
     {
-      "word": "Microsoft",
-      "start": 9.665,
-      "end": 10.26,
-      "pauseAfterMs": 0
-    },
-    {
-      "word": "teamed",
-      "start": 10.26,
-      "end": 10.405,
-      "pauseAfterMs": 0
-    },
-    {
-      "word": "up",
-      "start": 10.405,
-      "end": 10.62,
-      "pauseAfterMs": 0
-    },
-    {
-      "word": "with",
-      "start": 10.62,
-      "end": 10.865,
-      "pauseAfterMs": 0
-    },
-    {
-      "word": "Nvidia",
-      "start": 10.865,
-      "end": 11.38,
-      "pauseAfterMs": 0
-    },
-    {
-      "word": "to",
-      "start": 11.38,
-      "end": 11.48,
-      "pauseAfterMs": 0
-    },
-    {
-      "word": "build",
-      "start": 11.48,
-      "end": 11.71,
-      "pauseAfterMs": 0
+      "word": "even",
+      "start": 8.04,
+      "end": 8.23,
+      "spokenEnd": 8.23,
+      "pauseAfterMs": 0,
+      "confidence": 0.95
     },
     {
       "word": "the",
-      "start": 11.71,
-      "end": 11.845,
-      "pauseAfterMs": 0
+      "start": 8.23,
+      "end": 8.325,
+      "spokenEnd": 8.31,
+      "pauseAfterMs": 15,
+      "confidence": 0.99
+    },
+    {
+      "word": "craziest",
+      "start": 8.325,
+      "end": 8.945,
+      "spokenEnd": 8.86,
+      "pauseAfterMs": 85,
+      "confidence": 0.96
+    },
+    {
+      "word": "part.",
+      "start": 8.945,
+      "end": 10.06,
+      "spokenEnd": 9.25,
+      "pauseAfterMs": 810,
+      "confidence": 0.91
+    },
+    {
+      "word": "Microsoft",
+      "start": 10.06,
+      "end": 10.62,
+      "spokenEnd": 10.59,
+      "pauseAfterMs": 30,
+      "confidence": 0.77
+    },
+    {
+      "word": "teamed",
+      "start": 10.62,
+      "end": 10.96,
+      "spokenEnd": 10.96,
+      "pauseAfterMs": 0,
+      "confidence": 0.82
+    },
+    {
+      "word": "up",
+      "start": 10.96,
+      "end": 11.055,
+      "spokenEnd": 11.03,
+      "pauseAfterMs": 25,
+      "confidence": 0.95
+    },
+    {
+      "word": "with",
+      "start": 11.055,
+      "end": 11.28,
+      "spokenEnd": 11.28,
+      "pauseAfterMs": 0,
+      "confidence": 0.99
+    },
+    {
+      "word": "Nvidia",
+      "start": 11.28,
+      "end": 11.8,
+      "spokenEnd": 11.72,
+      "pauseAfterMs": 80,
+      "confidence": 0.81
+    },
+    {
+      "word": "to",
+      "start": 11.8,
+      "end": 11.94,
+      "spokenEnd": 11.91,
+      "pauseAfterMs": 30,
+      "confidence": 0.99
+    },
+    {
+      "word": "build",
+      "start": 11.94,
+      "end": 12.14,
+      "spokenEnd": 12.11,
+      "pauseAfterMs": 30,
+      "confidence": 0.97
+    },
+    {
+      "word": "the",
+      "start": 12.14,
+      "end": 12.3,
+      "spokenEnd": 12.3,
+      "pauseAfterMs": 0,
+      "confidence": 0.96
     },
     {
       "word": "new",
-      "start": 11.845,
-      "end": 12.14,
-      "pauseAfterMs": 0
+      "start": 12.3,
+      "end": 12.585,
+      "spokenEnd": 12.58,
+      "pauseAfterMs": 5,
+      "confidence": 0.98
     },
     {
       "word": "Surface",
-      "start": 12.14,
-      "end": 12.585,
-      "pauseAfterMs": 0
+      "start": 12.585,
+      "end": 13.015,
+      "spokenEnd": 12.97,
+      "pauseAfterMs": 45,
+      "confidence": 1
     },
     {
       "word": "Laptop",
-      "start": 12.585,
-      "end": 13.015,
-      "pauseAfterMs": 0
+      "start": 13.015,
+      "end": 13.56,
+      "spokenEnd": 13.46,
+      "pauseAfterMs": 100,
+      "confidence": 0.95
     },
     {
       "word": "Ultra,",
-      "start": 13.015,
+      "start": 13.56,
       "end": 14.18,
-      "pauseAfterMs": 0
+      "spokenEnd": 13.85,
+      "pauseAfterMs": 330,
+      "confidence": 0.81
     },
     {
       "word": "powered",
       "start": 14.18,
-      "end": 14.465,
-      "pauseAfterMs": 0
+      "end": 14.55,
+      "spokenEnd": 14.53,
+      "pauseAfterMs": 20,
+      "confidence": 0.95
     },
     {
       "word": "by",
-      "start": 14.465,
-      "end": 14.64,
-      "pauseAfterMs": 0
+      "start": 14.55,
+      "end": 14.725,
+      "spokenEnd": 14.72,
+      "pauseAfterMs": 5,
+      "confidence": 1
     },
     {
       "word": "Nvidia's",
-      "start": 14.64,
-      "end": 15.23,
-      "pauseAfterMs": 0
+      "start": 14.725,
+      "end": 15.3,
+      "spokenEnd": 15.19,
+      "pauseAfterMs": 110,
+      "confidence": 0.71
     },
     {
       "word": "new",
-      "start": 15.23,
-      "end": 15.46,
-      "pauseAfterMs": 0
+      "start": 15.3,
+      "end": 15.7,
+      "spokenEnd": 15.51,
+      "pauseAfterMs": 190,
+      "confidence": 0.85
     },
     {
       "word": "RTX",
-      "start": 15.46,
-      "end": 15.82,
-      "pauseAfterMs": 0
+      "start": 15.7,
+      "end": 16.25,
+      "spokenEnd": 16.18,
+      "pauseAfterMs": 70,
+      "confidence": 0.95
     },
     {
       "word": "Spark",
-      "start": 15.82,
-      "end": 16.37,
-      "pauseAfterMs": 0
+      "start": 16.25,
+      "end": 16.62,
+      "spokenEnd": 16.56,
+      "pauseAfterMs": 60,
+      "confidence": 0.79
     },
     {
       "word": "chip.",
-      "start": 16.37,
+      "start": 16.62,
       "end": 17.41,
-      "pauseAfterMs": 0
+      "spokenEnd": 16.8,
+      "pauseAfterMs": 610,
+      "confidence": 0.44
     },
     {
       "word": "And",
       "start": 17.41,
-      "end": 17.685,
-      "pauseAfterMs": 0
+      "end": 17.76,
+      "spokenEnd": 17.59,
+      "pauseAfterMs": 170,
+      "confidence": 0.62
     },
     {
       "word": "this",
-      "start": 17.685,
-      "end": 17.885,
-      "pauseAfterMs": 0
+      "start": 17.76,
+      "end": 18.02,
+      "spokenEnd": 17.91,
+      "pauseAfterMs": 110,
+      "confidence": 0.97
     },
     {
       "word": "is",
-      "start": 17.885,
-      "end": 18.09,
-      "pauseAfterMs": 0
+      "start": 18.02,
+      "end": 18.3,
+      "spokenEnd": 18.26,
+      "pauseAfterMs": 40,
+      "confidence": 0.94
     },
     {
       "word": "very",
-      "start": 18.09,
-      "end": 18.305,
-      "pauseAfterMs": 0
+      "start": 18.3,
+      "end": 18.66,
+      "spokenEnd": 18.65,
+      "pauseAfterMs": 10,
+      "confidence": 1
     },
     {
       "word": "different",
-      "start": 18.305,
-      "end": 18.71,
-      "pauseAfterMs": 0
+      "start": 18.66,
+      "end": 19.06,
+      "spokenEnd": 19.01,
+      "pauseAfterMs": 50,
+      "confidence": 1
     },
     {
       "word": "from",
-      "start": 18.71,
-      "end": 18.97,
-      "pauseAfterMs": 0
+      "start": 19.06,
+      "end": 19.2,
+      "spokenEnd": 19.19,
+      "pauseAfterMs": 10,
+      "confidence": 1
     },
     {
       "word": "your",
-      "start": 18.97,
-      "end": 19.085,
-      "pauseAfterMs": 0
+      "start": 19.2,
+      "end": 19.38,
+      "spokenEnd": 19.37,
+      "pauseAfterMs": 10,
+      "confidence": 1
     },
     {
       "word": "normal",
-      "start": 19.085,
-      "end": 19.435,
-      "pauseAfterMs": 0
+      "start": 19.38,
+      "end": 19.7,
+      "spokenEnd": 19.69,
+      "pauseAfterMs": 10,
+      "confidence": 0.96
     },
     {
       "word": "laptop",
-      "start": 19.435,
-      "end": 19.915,
-      "pauseAfterMs": 0
+      "start": 19.7,
+      "end": 20.14,
+      "spokenEnd": 20.11,
+      "pauseAfterMs": 30,
+      "confidence": 0.94
     },
     {
       "word": "GPU.",
-      "start": 19.915,
-      "end": 20.93,
-      "pauseAfterMs": 0
+      "start": 20.14,
+      "end": 21.255,
+      "spokenEnd": 20.59,
+      "pauseAfterMs": 665,
+      "confidence": 0.7
     },
     {
       "word": "Instead",
-      "start": 20.93,
-      "end": 21.46,
-      "pauseAfterMs": 0
+      "start": 21.255,
+      "end": 21.565,
+      "spokenEnd": 21.565,
+      "pauseAfterMs": 0,
+      "confidence": 0.96
     },
     {
       "word": "of",
-      "start": 21.46,
-      "end": 21.565,
-      "pauseAfterMs": 0
+      "start": 21.565,
+      "end": 21.74,
+      "spokenEnd": 21.67,
+      "pauseAfterMs": 70,
+      "confidence": 1
     },
     {
       "word": "having",
-      "start": 21.565,
-      "end": 21.875,
-      "pauseAfterMs": 0
+      "start": 21.74,
+      "end": 22.08,
+      "spokenEnd": 22.05,
+      "pauseAfterMs": 30,
+      "confidence": 0.96
     },
     {
       "word": "regular",
-      "start": 21.875,
-      "end": 22.23,
-      "pauseAfterMs": 0
+      "start": 22.08,
+      "end": 22.515,
+      "spokenEnd": 22.51,
+      "pauseAfterMs": 5,
+      "confidence": 0.98
     },
     {
       "word": "RAM",
-      "start": 22.23,
-      "end": 22.515,
-      "pauseAfterMs": 0
+      "start": 22.515,
+      "end": 22.725,
+      "spokenEnd": 22.72,
+      "pauseAfterMs": 5,
+      "confidence": 1
     },
     {
       "word": "over",
-      "start": 22.515,
-      "end": 22.875,
-      "pauseAfterMs": 0
+      "start": 22.725,
+      "end": 23.02,
+      "spokenEnd": 22.94,
+      "pauseAfterMs": 80,
+      "confidence": 1
     },
     {
       "word": "here,",
-      "start": 22.875,
-      "end": 23.18,
-      "pauseAfterMs": 0
+      "start": 23.02,
+      "end": 23.74,
+      "spokenEnd": 23.49,
+      "pauseAfterMs": 250,
+      "confidence": 0.93
     },
     {
       "word": "and",
-      "start": 23.18,
-      "end": 23.41,
-      "pauseAfterMs": 0
+      "start": 23.74,
+      "end": 23.95,
+      "spokenEnd": 23.91,
+      "pauseAfterMs": 40,
+      "confidence": 1
     },
     {
       "word": "separate",
-      "start": 23.41,
-      "end": 23.86,
-      "pauseAfterMs": 0
+      "start": 23.95,
+      "end": 24.34,
+      "spokenEnd": 24.31,
+      "pauseAfterMs": 30,
+      "confidence": 0.99
     },
     {
       "word": "graphics",
-      "start": 23.86,
-      "end": 24.355,
-      "pauseAfterMs": 0
+      "start": 24.34,
+      "end": 24.78,
+      "spokenEnd": 24.75,
+      "pauseAfterMs": 30,
+      "confidence": 0.96
     },
     {
       "word": "memory",
-      "start": 24.355,
-      "end": 24.78,
-      "pauseAfterMs": 0
+      "start": 24.78,
+      "end": 25.12,
+      "spokenEnd": 25.12,
+      "pauseAfterMs": 0,
+      "confidence": 0.98
     },
     {
       "word": "over",
-      "start": 24.78,
-      "end": 25.06,
-      "pauseAfterMs": 0
+      "start": 25.12,
+      "end": 25.36,
+      "spokenEnd": 25.31,
+      "pauseAfterMs": 50,
+      "confidence": 1
     },
     {
       "word": "there,",
-      "start": 25.06,
-      "end": 25.82,
-      "pauseAfterMs": 0
+      "start": 25.36,
+      "end": 26.17,
+      "spokenEnd": 25.73,
+      "pauseAfterMs": 440,
+      "confidence": 1
     },
     {
       "word": "the",
-      "start": 25.82,
-      "end": 25.905,
-      "pauseAfterMs": 0
+      "start": 26.17,
+      "end": 26.34,
+      "spokenEnd": 26.27,
+      "pauseAfterMs": 70,
+      "confidence": 0.99
     },
     {
       "word": "CPU",
-      "start": 25.905,
-      "end": 26.415,
-      "pauseAfterMs": 0
+      "start": 26.34,
+      "end": 27.04,
+      "spokenEnd": 26.99,
+      "pauseAfterMs": 50,
+      "confidence": 0.9
     },
     {
       "word": "and",
-      "start": 26.415,
-      "end": 26.57,
-      "pauseAfterMs": 0
+      "start": 27.04,
+      "end": 27.21,
+      "spokenEnd": 27.21,
+      "pauseAfterMs": 0,
+      "confidence": 0.92
     },
     {
       "word": "Nvidia",
-      "start": 26.57,
-      "end": 27.04,
-      "pauseAfterMs": 0
+      "start": 27.21,
+      "end": 27.675,
+      "spokenEnd": 27.66,
+      "pauseAfterMs": 15,
+      "confidence": 0.84
     },
     {
       "word": "GPU",
-      "start": 27.04,
-      "end": 27.44,
-      "pauseAfterMs": 0
+      "start": 27.675,
+      "end": 28.28,
+      "spokenEnd": 28.22,
+      "pauseAfterMs": 60,
+      "confidence": 0.68
     },
     {
       "word": "can",
-      "start": 27.44,
-      "end": 27.55,
-      "pauseAfterMs": 0
+      "start": 28.28,
+      "end": 28.435,
+      "spokenEnd": 28.43,
+      "pauseAfterMs": 5,
+      "confidence": 1
     },
     {
       "word": "share",
-      "start": 27.55,
-      "end": 27.94,
-      "pauseAfterMs": 0
+      "start": 28.435,
+      "end": 28.74,
+      "spokenEnd": 28.71,
+      "pauseAfterMs": 30,
+      "confidence": 0.93
     },
     {
       "word": "the",
-      "start": 27.94,
-      "end": 28.03,
-      "pauseAfterMs": 0
+      "start": 28.74,
+      "end": 28.94,
+      "spokenEnd": 28.91,
+      "pauseAfterMs": 30,
+      "confidence": 0.97
     },
     {
       "word": "same",
-      "start": 28.03,
-      "end": 28.18,
-      "pauseAfterMs": 0
+      "start": 28.94,
+      "end": 32.1,
+      "spokenEnd": 29.29,
+      "pauseAfterMs": 2810,
+      "confidence": 0.89
     },
     {
       "word": "128",
-      "start": 28.18,
-      "end": 28.335,
-      "pauseAfterMs": 0
+      "start": 32.1,
+      "end": 33.14,
+      "spokenEnd": 33.14,
+      "pauseAfterMs": 0,
+      "confidence": 0.95
     },
     {
       "word": "pool",
-      "start": 28.335,
-      "end": 28.555,
-      "pauseAfterMs": 0
+      "start": 33.14,
+      "end": 33.26,
+      "spokenEnd": 33.26,
+      "pauseAfterMs": 0,
+      "confidence": 0
     },
     {
       "word": "of",
-      "start": 28.555,
-      "end": 28.65,
-      "pauseAfterMs": 0
+      "start": 33.26,
+      "end": 33.32,
+      "spokenEnd": 33.32,
+      "pauseAfterMs": 0,
+      "confidence": 0
     },
     {
       "word": "memory.",
-      "start": 28.65,
-      "end": 28.74,
-      "pauseAfterMs": 0
+      "start": 33.32,
+      "end": 33.46,
+      "spokenEnd": 33.46,
+      "pauseAfterMs": 0,
+      "confidence": 0.01
     },
     {
       "word": "gigabytes",
-      "start": 28.74,
-      "end": 29.32,
-      "pauseAfterMs": 0
+      "start": 33.46,
+      "end": 33.695,
+      "spokenEnd": 33.69,
+      "pauseAfterMs": 5,
+      "confidence": 0.22
     },
     {
       "word": "of",
-      "start": 29.32,
-      "end": 29.41,
-      "pauseAfterMs": 0
+      "start": 33.695,
+      "end": 33.86,
+      "spokenEnd": 33.8,
+      "pauseAfterMs": 60,
+      "confidence": 1
     },
     {
       "word": "it.",
-      "start": 29.41,
-      "end": 29.785,
-      "pauseAfterMs": 0
+      "start": 33.86,
+      "end": 33.91,
+      "spokenEnd": 33.91,
+      "pauseAfterMs": 0,
+      "confidence": 0.02
     },
     {
       "word": "Now,",
-      "start": 29.785,
-      "end": 30.02,
-      "pauseAfterMs": 0
+      "start": 33.91,
+      "end": 34.235,
+      "spokenEnd": 34.23,
+      "pauseAfterMs": 5,
+      "confidence": 0
     },
     {
       "word": "Microsoft",
-      "start": 30.02,
-      "end": 30.19,
-      "pauseAfterMs": 0
+      "start": 34.235,
+      "end": 34.84,
+      "spokenEnd": 34.75,
+      "pauseAfterMs": 90,
+      "confidence": 0.11
     },
     {
       "word": "that",
-      "start": 30.19,
-      "end": 30.445,
-      "pauseAfterMs": 0
+      "start": 34.84,
+      "end": 35.07,
+      "spokenEnd": 35.03,
+      "pauseAfterMs": 40,
+      "confidence": 0.99
     },
     {
       "word": "does",
-      "start": 30.445,
-      "end": 30.71,
-      "pauseAfterMs": 0
+      "start": 35.07,
+      "end": 35.46,
+      "spokenEnd": 35.46,
+      "pauseAfterMs": 0,
+      "confidence": 0.97
     },
     {
       "word": "not",
-      "start": 30.71,
-      "end": 30.925,
-      "pauseAfterMs": 0
+      "start": 35.46,
+      "end": 35.78,
+      "spokenEnd": 35.71,
+      "pauseAfterMs": 70,
+      "confidence": 0.99
     },
     {
       "word": "mean",
-      "start": 30.925,
-      "end": 31.175,
-      "pauseAfterMs": 0
+      "start": 35.78,
+      "end": 36.02,
+      "spokenEnd": 36.02,
+      "pauseAfterMs": 0,
+      "confidence": 0.96
     },
     {
       "word": "you're",
-      "start": 31.175,
-      "end": 31.255,
-      "pauseAfterMs": 0
+      "start": 36.02,
+      "end": 36.2,
+      "spokenEnd": 36.19,
+      "pauseAfterMs": 10,
+      "confidence": 0.69
     },
     {
       "word": "getting",
-      "start": 31.255,
-      "end": 31.535,
-      "pauseAfterMs": 0
+      "start": 36.2,
+      "end": 36.48,
+      "spokenEnd": 36.48,
+      "pauseAfterMs": 0,
+      "confidence": 0.95
     },
     {
       "word": "an",
-      "start": 31.535,
-      "end": 31.735,
-      "pauseAfterMs": 0
+      "start": 36.48,
+      "end": 36.62,
+      "spokenEnd": 36.62,
+      "pauseAfterMs": 0,
+      "confidence": 1
     },
     {
       "word": "Nvidia",
-      "start": 31.735,
-      "end": 32.14,
-      "pauseAfterMs": 0
+      "start": 36.62,
+      "end": 37.06,
+      "spokenEnd": 37.02,
+      "pauseAfterMs": 40,
+      "confidence": 0.69
     },
     {
       "word": "graphics",
-      "start": 32.14,
-      "end": 32.53,
-      "pauseAfterMs": 0
+      "start": 37.06,
+      "end": 37.52,
+      "spokenEnd": 37.49,
+      "pauseAfterMs": 30,
+      "confidence": 0.98
     },
     {
       "word": "card",
-      "start": 32.53,
-      "end": 32.805,
-      "pauseAfterMs": 0
+      "start": 37.52,
+      "end": 37.86,
+      "spokenEnd": 37.82,
+      "pauseAfterMs": 40,
+      "confidence": 1
     },
     {
       "word": "with",
-      "start": 32.805,
-      "end": 33.17,
-      "pauseAfterMs": 0
+      "start": 37.86,
+      "end": 38.12,
+      "spokenEnd": 37.99,
+      "pauseAfterMs": 130,
+      "confidence": 0.99
     },
     {
       "word": "128",
-      "start": 33.17,
-      "end": 33.91,
-      "pauseAfterMs": 0
+      "start": 38.12,
+      "end": 39.02,
+      "spokenEnd": 39.01,
+      "pauseAfterMs": 10,
+      "confidence": 0.97
     },
     {
       "word": "gigs",
-      "start": 33.91,
-      "end": 34.235,
-      "pauseAfterMs": 0
+      "start": 39.02,
+      "end": 39.3,
+      "spokenEnd": 39.3,
+      "pauseAfterMs": 0,
+      "confidence": 0.97
     },
     {
       "word": "of",
-      "start": 34.235,
-      "end": 34.415,
-      "pauseAfterMs": 0
+      "start": 39.3,
+      "end": 39.425,
+      "spokenEnd": 39.42,
+      "pauseAfterMs": 5,
+      "confidence": 0.45
     },
     {
       "word": "VRAM.",
-      "start": 34.415,
-      "end": 34.95,
-      "pauseAfterMs": 0
+      "start": 39.425,
+      "end": 40.33,
+      "spokenEnd": 39.75,
+      "pauseAfterMs": 580,
+      "confidence": 0.22
     },
     {
       "word": "The",
-      "start": 34.95,
-      "end": 35.25,
-      "pauseAfterMs": 0
+      "start": 40.33,
+      "end": 40.63,
+      "spokenEnd": 40.47,
+      "pauseAfterMs": 160,
+      "confidence": 0.67
     },
     {
       "word": "actual",
-      "start": 35.25,
-      "end": 35.555,
-      "pauseAfterMs": 0
+      "start": 40.63,
+      "end": 40.945,
+      "spokenEnd": 40.94,
+      "pauseAfterMs": 5,
+      "confidence": 0.96
     },
     {
       "word": "GPU",
-      "start": 35.555,
-      "end": 36.05,
-      "pauseAfterMs": 0
+      "start": 40.945,
+      "end": 41.655,
+      "spokenEnd": 41.6,
+      "pauseAfterMs": 55,
+      "confidence": 0.96
     },
     {
       "word": "is",
-      "start": 36.05,
-      "end": 36.2,
-      "pauseAfterMs": 0
+      "start": 41.655,
+      "end": 41.76,
+      "spokenEnd": 41.76,
+      "pauseAfterMs": 0,
+      "confidence": 1
     },
     {
       "word": "a",
-      "start": 36.2,
-      "end": 36.315,
-      "pauseAfterMs": 0
+      "start": 41.76,
+      "end": 41.9,
+      "spokenEnd": 41.83,
+      "pauseAfterMs": 70,
+      "confidence": 1
     },
     {
       "word": "Blackwell",
-      "start": 36.315,
-      "end": 36.735,
-      "pauseAfterMs": 0
+      "start": 41.9,
+      "end": 42.56,
+      "spokenEnd": 42.42,
+      "pauseAfterMs": 140,
+      "confidence": 0.96
     },
     {
       "word": "RTX",
-      "start": 36.735,
-      "end": 37.085,
-      "pauseAfterMs": 0
+      "start": 42.56,
+      "end": 43.1,
+      "spokenEnd": 42.99,
+      "pauseAfterMs": 110,
+      "confidence": 0.98
     },
     {
       "word": "GPU,",
-      "start": 37.085,
-      "end": 37.69,
-      "pauseAfterMs": 0
+      "start": 43.1,
+      "end": 43.815,
+      "spokenEnd": 43.67,
+      "pauseAfterMs": 145,
+      "confidence": 0.61
     },
     {
       "word": "with",
-      "start": 37.69,
-      "end": 37.86,
-      "pauseAfterMs": 0
+      "start": 43.815,
+      "end": 44.02,
+      "spokenEnd": 44.02,
+      "pauseAfterMs": 0,
+      "confidence": 0.95
     },
     {
       "word": "up",
-      "start": 37.86,
-      "end": 38.12,
-      "pauseAfterMs": 0
+      "start": 44.02,
+      "end": 44.08,
+      "spokenEnd": 44.07,
+      "pauseAfterMs": 10,
+      "confidence": 1
     },
     {
       "word": "to",
-      "start": 38.12,
-      "end": 38.305,
-      "pauseAfterMs": 0
+      "start": 44.08,
+      "end": 44.34,
+      "spokenEnd": 44.22,
+      "pauseAfterMs": 120,
+      "confidence": 0.94
     },
     {
       "word": "6,144",
-      "start": 38.305,
-      "end": 39.05,
-      "pauseAfterMs": 0
+      "start": 44.34,
+      "end": 46.32,
+      "spokenEnd": 46.32,
+      "pauseAfterMs": 0,
+      "confidence": 0.91
     },
     {
       "word": "CUDA",
-      "start": 39.05,
-      "end": 39.53,
-      "pauseAfterMs": 0
+      "start": 46.32,
+      "end": 46.605,
+      "spokenEnd": 46.57,
+      "pauseAfterMs": 35,
+      "confidence": 0.4
     },
     {
       "word": "cores.",
-      "start": 39.53,
-      "end": 40.095,
-      "pauseAfterMs": 0
+      "start": 46.605,
+      "end": 47.54,
+      "spokenEnd": 46.91,
+      "pauseAfterMs": 630,
+      "confidence": 0.79
     },
     {
       "word": "But",
-      "start": 40.095,
-      "end": 40.33,
-      "pauseAfterMs": 0
+      "start": 47.54,
+      "end": 47.795,
+      "spokenEnd": 47.75,
+      "pauseAfterMs": 45,
+      "confidence": 0.92
     },
     {
       "word": "because",
-      "start": 40.33,
-      "end": 40.735,
-      "pauseAfterMs": 0
+      "start": 47.795,
+      "end": 48.17,
+      "spokenEnd": 48.15,
+      "pauseAfterMs": 20,
+      "confidence": 0.99
     },
     {
       "word": "it",
-      "start": 40.735,
-      "end": 40.82,
-      "pauseAfterMs": 0
+      "start": 48.17,
+      "end": 48.28,
+      "spokenEnd": 48.28,
+      "pauseAfterMs": 0,
+      "confidence": 0.94
     },
     {
       "word": "can",
-      "start": 40.82,
-      "end": 40.945,
-      "pauseAfterMs": 0
+      "start": 48.28,
+      "end": 48.52,
+      "spokenEnd": 48.4,
+      "pauseAfterMs": 120,
+      "confidence": 0.84
     },
     {
       "word": "access",
-      "start": 40.945,
-      "end": 41.415,
-      "pauseAfterMs": 0
+      "start": 48.52,
+      "end": 48.9,
+      "spokenEnd": 48.84,
+      "pauseAfterMs": 60,
+      "confidence": 0.99
     },
     {
       "word": "that",
-      "start": 41.415,
-      "end": 41.53,
-      "pauseAfterMs": 0
+      "start": 48.9,
+      "end": 49.22,
+      "spokenEnd": 49.03,
+      "pauseAfterMs": 190,
+      "confidence": 0.97
     },
     {
       "word": "huge",
-      "start": 41.53,
-      "end": 41.925,
-      "pauseAfterMs": 0
+      "start": 49.22,
+      "end": 49.65,
+      "spokenEnd": 49.65,
+      "pauseAfterMs": 0,
+      "confidence": 0.98
     },
     {
       "word": "shared",
-      "start": 41.925,
-      "end": 42.335,
-      "pauseAfterMs": 0
+      "start": 49.65,
+      "end": 49.98,
+      "spokenEnd": 49.97,
+      "pauseAfterMs": 10,
+      "confidence": 0.95
     },
     {
       "word": "memory",
-      "start": 42.335,
-      "end": 42.75,
-      "pauseAfterMs": 0
+      "start": 49.98,
+      "end": 50.42,
+      "spokenEnd": 50.37,
+      "pauseAfterMs": 50,
+      "confidence": 0.97
     },
     {
       "word": "pool,",
-      "start": 42.75,
-      "end": 43.175,
-      "pauseAfterMs": 0
+      "start": 50.42,
+      "end": 50.96,
+      "spokenEnd": 50.71,
+      "pauseAfterMs": 250,
+      "confidence": 1
     },
     {
       "word": "it",
-      "start": 43.175,
-      "end": 43.345,
-      "pauseAfterMs": 0
+      "start": 50.96,
+      "end": 51.07,
+      "spokenEnd": 51.05,
+      "pauseAfterMs": 20,
+      "confidence": 0.92
     },
     {
       "word": "can",
-      "start": 43.345,
-      "end": 43.53,
-      "pauseAfterMs": 0
+      "start": 51.07,
+      "end": 51.26,
+      "spokenEnd": 51.26,
+      "pauseAfterMs": 0,
+      "confidence": 0.85
     },
     {
       "word": "handle",
-      "start": 43.53,
-      "end": 43.955,
-      "pauseAfterMs": 0
+      "start": 51.26,
+      "end": 51.55,
+      "spokenEnd": 51.55,
+      "pauseAfterMs": 0,
+      "confidence": 0.97
     },
     {
       "word": "workloads",
-      "start": 43.955,
-      "end": 44.495,
-      "pauseAfterMs": 0
+      "start": 51.55,
+      "end": 52.115,
+      "spokenEnd": 52.07,
+      "pauseAfterMs": 45,
+      "confidence": 0.8
     },
     {
       "word": "that",
-      "start": 44.495,
-      "end": 44.615,
-      "pauseAfterMs": 0
+      "start": 52.115,
+      "end": 52.42,
+      "spokenEnd": 52.25,
+      "pauseAfterMs": 170,
+      "confidence": 0.94
     },
     {
       "word": "normally",
-      "start": 44.615,
-      "end": 45.13,
-      "pauseAfterMs": 0
+      "start": 52.42,
+      "end": 52.78,
+      "spokenEnd": 52.78,
+      "pauseAfterMs": 0,
+      "confidence": 0.16
     },
     {
       "word": "wouldn't",
-      "start": 45.13,
-      "end": 45.37,
-      "pauseAfterMs": 0
+      "start": 52.78,
+      "end": 53.1,
+      "spokenEnd": 53.1,
+      "pauseAfterMs": 0,
+      "confidence": 0.98
     },
     {
       "word": "even",
-      "start": 45.37,
-      "end": 45.69,
-      "pauseAfterMs": 0
+      "start": 53.1,
+      "end": 53.48,
+      "spokenEnd": 53.27,
+      "pauseAfterMs": 210,
+      "confidence": 0.97
     },
     {
       "word": "fit",
-      "start": 45.69,
-      "end": 45.88,
-      "pauseAfterMs": 0
+      "start": 53.48,
+      "end": 53.705,
+      "spokenEnd": 53.67,
+      "pauseAfterMs": 35,
+      "confidence": 1
     },
     {
       "word": "into",
-      "start": 45.88,
-      "end": 46.09,
-      "pauseAfterMs": 0
+      "start": 53.705,
+      "end": 54.02,
+      "spokenEnd": 54.02,
+      "pauseAfterMs": 0,
+      "confidence": 1
     },
     {
       "word": "a",
-      "start": 46.09,
-      "end": 46.225,
-      "pauseAfterMs": 0
+      "start": 54.02,
+      "end": 54.06,
+      "spokenEnd": 54.06,
+      "pauseAfterMs": 0,
+      "confidence": 0.98
     },
     {
       "word": "laptop",
-      "start": 46.225,
-      "end": 46.605,
-      "pauseAfterMs": 0
+      "start": 54.06,
+      "end": 54.525,
+      "spokenEnd": 54.49,
+      "pauseAfterMs": 35,
+      "confidence": 1
     },
     {
       "word": "GPU's",
-      "start": 46.605,
-      "end": 47.17,
-      "pauseAfterMs": 0
+      "start": 54.525,
+      "end": 55.06,
+      "spokenEnd": 55.06,
+      "pauseAfterMs": 0,
+      "confidence": 0.69
     },
     {
       "word": "memory.",
-      "start": 47.17,
-      "end": 47.795,
-      "pauseAfterMs": 0
+      "start": 55.06,
+      "end": 56.025,
+      "spokenEnd": 55.39,
+      "pauseAfterMs": 635,
+      "confidence": 0.99
     },
     {
       "word": "And",
-      "start": 47.795,
-      "end": 48.015,
-      "pauseAfterMs": 0
+      "start": 56.025,
+      "end": 56.205,
+      "spokenEnd": 56.17,
+      "pauseAfterMs": 35,
+      "confidence": 0.94
     },
     {
       "word": "that's",
-      "start": 48.015,
-      "end": 48.305,
-      "pauseAfterMs": 0
+      "start": 56.205,
+      "end": 56.59,
+      "spokenEnd": 56.55,
+      "pauseAfterMs": 40,
+      "confidence": 0.79
     },
     {
       "word": "where",
-      "start": 48.305,
-      "end": 48.425,
-      "pauseAfterMs": 0
+      "start": 56.59,
+      "end": 56.82,
+      "spokenEnd": 56.77,
+      "pauseAfterMs": 50,
+      "confidence": 0.94
     },
     {
       "word": "things",
-      "start": 48.425,
-      "end": 48.8,
-      "pauseAfterMs": 0
+      "start": 56.82,
+      "end": 57.13,
+      "spokenEnd": 57.08,
+      "pauseAfterMs": 50,
+      "confidence": 0.98
     },
     {
       "word": "get",
-      "start": 48.8,
-      "end": 49.07,
-      "pauseAfterMs": 0
+      "start": 57.13,
+      "end": 57.42,
+      "spokenEnd": 57.31,
+      "pauseAfterMs": 110,
+      "confidence": 0.95
     },
     {
       "word": "ridiculous.",
-      "start": 49.07,
-      "end": 49.98,
-      "pauseAfterMs": 0
+      "start": 57.42,
+      "end": 58.92,
+      "spokenEnd": 58.23,
+      "pauseAfterMs": 690,
+      "confidence": 0.98
     },
     {
       "word": "Nvidia",
-      "start": 49.98,
-      "end": 50.45,
-      "pauseAfterMs": 0
+      "start": 58.92,
+      "end": 59.365,
+      "spokenEnd": 59.29,
+      "pauseAfterMs": 75,
+      "confidence": 0.96
     },
     {
       "word": "says",
-      "start": 50.45,
-      "end": 50.71,
-      "pauseAfterMs": 0
+      "start": 59.365,
+      "end": 59.775,
+      "spokenEnd": 59.6,
+      "pauseAfterMs": 175,
+      "confidence": 0.94
     },
     {
       "word": "RTX",
-      "start": 50.71,
-      "end": 51.285,
-      "pauseAfterMs": 0
+      "start": 59.775,
+      "end": 60.24,
+      "spokenEnd": 60.15,
+      "pauseAfterMs": 90,
+      "confidence": 1
     },
     {
       "word": "Spark",
-      "start": 51.285,
-      "end": 51.655,
-      "pauseAfterMs": 0
+      "start": 60.24,
+      "end": 60.615,
+      "spokenEnd": 60.51,
+      "pauseAfterMs": 105,
+      "confidence": 0.94
     },
     {
       "word": "delivers",
-      "start": 51.655,
-      "end": 52.115,
-      "pauseAfterMs": 0
+      "start": 60.615,
+      "end": 61.1,
+      "spokenEnd": 60.99,
+      "pauseAfterMs": 110,
+      "confidence": 0.99
     },
     {
       "word": "up",
-      "start": 52.115,
-      "end": 52.29,
-      "pauseAfterMs": 0
+      "start": 61.1,
+      "end": 61.2,
+      "spokenEnd": 61.15,
+      "pauseAfterMs": 50,
+      "confidence": 1
     },
     {
       "word": "to",
-      "start": 52.29,
-      "end": 52.455,
-      "pauseAfterMs": 0
+      "start": 61.2,
+      "end": 61.58,
+      "spokenEnd": 61.41,
+      "pauseAfterMs": 170,
+      "confidence": 0.99
     },
     {
       "word": "one",
-      "start": 52.455,
-      "end": 52.78,
-      "pauseAfterMs": 0
+      "start": 61.58,
+      "end": 61.855,
+      "spokenEnd": 61.79,
+      "pauseAfterMs": 65,
+      "confidence": 1
     },
     {
       "word": "petaflop",
-      "start": 52.78,
-      "end": 53.135,
-      "pauseAfterMs": 0
+      "start": 61.855,
+      "end": 62.54,
+      "spokenEnd": 62.45,
+      "pauseAfterMs": 90,
+      "confidence": 0.77
     },
     {
       "word": "of",
-      "start": 53.135,
-      "end": 53.395,
-      "pauseAfterMs": 0
+      "start": 62.54,
+      "end": 62.72,
+      "spokenEnd": 62.6,
+      "pauseAfterMs": 120,
+      "confidence": 1
     },
     {
       "word": "AI",
-      "start": 53.395,
-      "end": 53.705,
-      "pauseAfterMs": 0
+      "start": 62.72,
+      "end": 62.8,
+      "spokenEnd": 62.8,
+      "pauseAfterMs": 0,
+      "confidence": 0.5
     },
     {
       "word": "inference",
-      "start": 53.705,
-      "end": 54.29,
-      "pauseAfterMs": 0
+      "start": 62.8,
+      "end": 63.04,
+      "spokenEnd": 62.99,
+      "pauseAfterMs": 50,
+      "confidence": 0
     },
     {
       "word": "performance.",
-      "start": 54.29,
-      "end": 54.735,
-      "pauseAfterMs": 0
+      "start": 63.04,
+      "end": 63.885,
+      "spokenEnd": 63.54,
+      "pauseAfterMs": 345,
+      "confidence": 0.76
     },
     {
       "word": "That's",
-      "start": 54.735,
-      "end": 55.085,
-      "pauseAfterMs": 0
+      "start": 63.885,
+      "end": 64.22,
+      "spokenEnd": 64.13,
+      "pauseAfterMs": 90,
+      "confidence": 0.16
     },
     {
       "word": "about",
-      "start": 55.085,
-      "end": 55.265,
-      "pauseAfterMs": 0
+      "start": 64.22,
+      "end": 64.675,
+      "spokenEnd": 64.51,
+      "pauseAfterMs": 165,
+      "confidence": 0.4
     },
     {
       "word": "five",
-      "start": 55.265,
-      "end": 55.46,
-      "pauseAfterMs": 0
+      "start": 64.675,
+      "end": 65.08,
+      "spokenEnd": 65.07,
+      "pauseAfterMs": 10,
+      "confidence": 0.23
     },
     {
       "word": "times",
-      "start": 55.46,
-      "end": 55.76,
-      "pauseAfterMs": 0
+      "start": 65.08,
+      "end": 65.3,
+      "spokenEnd": 65.27,
+      "pauseAfterMs": 30,
+      "confidence": 0.18
     },
     {
       "word": "faster",
-      "start": 55.76,
-      "end": 56.025,
-      "pauseAfterMs": 0
+      "start": 65.3,
+      "end": 65.76,
+      "spokenEnd": 65.72,
+      "pauseAfterMs": 40,
+      "confidence": 0.33
     },
     {
       "word": "than",
-      "start": 56.025,
-      "end": 56.205,
-      "pauseAfterMs": 0
+      "start": 65.76,
+      "end": 66.34,
+      "spokenEnd": 65.93,
+      "pauseAfterMs": 410,
+      "confidence": 0.27
     },
     {
       "word": "the",
-      "start": 56.205,
-      "end": 56.385,
-      "pauseAfterMs": 0
+      "start": 66.34,
+      "end": 67.3,
+      "spokenEnd": 66.71,
+      "pauseAfterMs": 590,
+      "confidence": 0.63
     },
     {
       "word": "previous",
-      "start": 56.385,
-      "end": 56.675,
-      "pauseAfterMs": 0
+      "start": 67.3,
+      "end": 67.88,
+      "spokenEnd": 67.87,
+      "pauseAfterMs": 10,
+      "confidence": 0.45
     },
     {
       "word": "generation.",
-      "start": 56.675,
-      "end": 57.32,
-      "pauseAfterMs": 0
+      "start": 67.88,
+      "end": 69.06,
+      "spokenEnd": 68.46,
+      "pauseAfterMs": 600,
+      "confidence": 0.03
     },
     {
       "word": "So",
-      "start": 57.32,
-      "end": 57.42,
-      "pauseAfterMs": 0
+      "start": 69.06,
+      "end": 69.165,
+      "spokenEnd": 69.16,
+      "pauseAfterMs": 5,
+      "confidence": 0.5
     },
     {
       "word": "if",
-      "start": 57.42,
-      "end": 57.685,
-      "pauseAfterMs": 0
+      "start": 69.165,
+      "end": 69.9,
+      "spokenEnd": 69.37,
+      "pauseAfterMs": 530,
+      "confidence": 0.49
     },
     {
       "word": "you're",
-      "start": 57.685,
-      "end": 57.91,
-      "pauseAfterMs": 0
+      "start": 69.9,
+      "end": 70.28,
+      "spokenEnd": 70.27,
+      "pauseAfterMs": 10,
+      "confidence": 0.67
     },
     {
       "word": "a",
-      "start": 57.91,
-      "end": 58,
-      "pauseAfterMs": 0
+      "start": 70.28,
+      "end": 70.34,
+      "spokenEnd": 70.34,
+      "pauseAfterMs": 0,
+      "confidence": 1
     },
     {
       "word": "developer",
-      "start": 58,
-      "end": 58.125,
-      "pauseAfterMs": 0
+      "start": 70.34,
+      "end": 70.74,
+      "spokenEnd": 70.74,
+      "pauseAfterMs": 0,
+      "confidence": 0.22
     },
     {
       "word": ".",
-      "start": 58.125,
-      "end": 58.3,
+      "start": 70.74,
+      "end": 70.78,
+      "spokenEnd": 70.78,
       "pauseAfterMs": 0
     },
     {
       "word": "building",
-      "start": 58.3,
-      "end": 58.62,
-      "pauseAfterMs": 0
+      "start": 70.76,
+      "end": 71.78,
+      "spokenEnd": 71.43,
+      "pauseAfterMs": 350,
+      "confidence": 0.12
     },
     {
       "word": "and",
-      "start": 58.62,
-      "end": 58.755,
-      "pauseAfterMs": 0
+      "start": 71.78,
+      "end": 71.965,
+      "spokenEnd": 71.87,
+      "pauseAfterMs": 95,
+      "confidence": 0.66
     },
     {
       "word": "running",
-      "start": 58.755,
-      "end": 58.845,
-      "pauseAfterMs": 0
+      "start": 71.965,
+      "end": 72.48,
+      "spokenEnd": 72.35,
+      "pauseAfterMs": 130,
+      "confidence": 0.08
     },
     {
       "word": "NVIDIA",
-      "start": 58.845,
-      "end": 59.11,
-      "pauseAfterMs": 0
+      "start": 72.48,
+      "end": 73.38,
+      "spokenEnd": 72.89,
+      "pauseAfterMs": 490,
+      "confidence": 0.03
     },
     {
       "word": "complex",
-      "start": 59.11,
-      "end": 59.465,
-      "pauseAfterMs": 0
+      "start": 73.38,
+      "end": 73.98,
+      "spokenEnd": 73.98,
+      "pauseAfterMs": 0,
+      "confidence": 0.29
     },
     {
       "word": "says",
-      "start": 59.465,
-      "end": 59.575,
-      "pauseAfterMs": 0
+      "start": 73.98,
+      "end": 74.24,
+      "spokenEnd": 74.15,
+      "pauseAfterMs": 90,
+      "confidence": 0
     },
     {
       "word": "AI",
-      "start": 59.575,
-      "end": 59.855,
-      "pauseAfterMs": 0
+      "start": 74.24,
+      "end": 74.62,
+      "spokenEnd": 74.62,
+      "pauseAfterMs": 0,
+      "confidence": 0.5
     },
     {
       "word": "models",
-      "start": 59.855,
-      "end": 60.14,
-      "pauseAfterMs": 0
+      "start": 74.62,
+      "end": 74.9,
+      "spokenEnd": 74.88,
+      "pauseAfterMs": 20,
+      "confidence": 0.83
     },
     {
       "word": "RTX",
-      "start": 60.14,
-      "end": 60.855,
-      "pauseAfterMs": 0
+      "start": 74.9,
+      "end": 75.115,
+      "spokenEnd": 75.01,
+      "pauseAfterMs": 105,
+      "confidence": 0.3
     },
     {
       "word": "Spark",
-      "start": 60.855,
-      "end": 61.62,
-      "pauseAfterMs": 0
+      "start": 75.115,
+      "end": 76.34,
+      "spokenEnd": 75.48,
+      "pauseAfterMs": 860,
+      "confidence": 0.01
     },
     {
       "word": "delivers",
-      "start": 61.62,
-      "end": 62.055,
-      "pauseAfterMs": 0
+      "start": 76.34,
+      "end": 76.855,
+      "spokenEnd": 76.81,
+      "pauseAfterMs": 45,
+      "confidence": 0.37
     },
     {
       "word": "up",
-      "start": 62.055,
-      "end": 62.355,
-      "pauseAfterMs": 0
+      "start": 76.855,
+      "end": 77.26,
+      "spokenEnd": 76.97,
+      "pauseAfterMs": 290,
+      "confidence": 0.5
     },
     {
       "word": "to",
-      "start": 62.355,
-      "end": 62.925,
-      "pauseAfterMs": 0
+      "start": 77.26,
+      "end": 77.32,
+      "spokenEnd": 77.32,
+      "pauseAfterMs": 0,
+      "confidence": 0.5
     },
     {
       "word": "one",
-      "start": 62.925,
-      "end": 63.8,
-      "pauseAfterMs": 0
+      "start": 77.32,
+      "end": 77.765,
+      "spokenEnd": 77.39,
+      "pauseAfterMs": 375,
+      "confidence": 0.02
     },
     {
       "word": "petaflop",
-      "start": 63.8,
-      "end": 64.45,
-      "pauseAfterMs": 0
+      "start": 77.765,
+      "end": 78.22,
+      "spokenEnd": 78.21,
+      "pauseAfterMs": 10,
+      "confidence": 0.49
     },
     {
       "word": "of",
-      "start": 64.45,
-      "end": 64.765,
-      "pauseAfterMs": 0
+      "start": 78.22,
+      "end": 78.29,
+      "spokenEnd": 78.29,
+      "pauseAfterMs": 0,
+      "confidence": 0.63
     },
     {
       "word": "AI",
-      "start": 64.765,
-      "end": 65.78,
-      "pauseAfterMs": 0
+      "start": 78.29,
+      "end": 78.86,
+      "spokenEnd": 78.43,
+      "pauseAfterMs": 430,
+      "confidence": 0.5
     },
     {
       "word": "performance,",
-      "start": 65.78,
-      "end": 66.405,
-      "pauseAfterMs": 0
+      "start": 78.86,
+      "end": 79.74,
+      "spokenEnd": 79.65,
+      "pauseAfterMs": 90,
+      "confidence": 0.23
     },
     {
       "word": "and",
-      "start": 66.405,
-      "end": 66.76,
-      "pauseAfterMs": 0
+      "start": 79.74,
+      "end": 80.08,
+      "spokenEnd": 80.05,
+      "pauseAfterMs": 30,
+      "confidence": 0
     },
     {
       "word": "can",
-      "start": 66.76,
-      "end": 67.035,
-      "pauseAfterMs": 0
+      "start": 80.08,
+      "end": 80.26,
+      "spokenEnd": 80.26,
+      "pauseAfterMs": 0,
+      "confidence": 0
     },
     {
       "word": "run",
-      "start": 67.035,
-      "end": 67.585,
-      "pauseAfterMs": 0
+      "start": 80.26,
+      "end": 81.64,
+      "spokenEnd": 81.08,
+      "pauseAfterMs": 560,
+      "confidence": 0.29
     },
     {
       "word": "AI",
-      "start": 67.585,
-      "end": 68.105,
-      "pauseAfterMs": 0
+      "start": 81.64,
+      "end": 82,
+      "spokenEnd": 81.88,
+      "pauseAfterMs": 120,
+      "confidence": 0.5
     },
     {
       "word": "models",
-      "start": 68.105,
-      "end": 68.635,
-      "pauseAfterMs": 0
+      "start": 82,
+      "end": 82.78,
+      "spokenEnd": 82.59,
+      "pauseAfterMs": 190,
+      "confidence": 0.28
     },
     {
       "word": "with",
-      "start": 68.635,
-      "end": 69.165,
-      "pauseAfterMs": 0
+      "start": 82.78,
+      "end": 84.34,
+      "spokenEnd": 83.1,
+      "pauseAfterMs": 1240,
+      "confidence": 0.25
     },
     {
       "word": "around",
-      "start": 69.165,
-      "end": 69.95,
-      "pauseAfterMs": 0
+      "start": 84.34,
+      "end": 84.695,
+      "spokenEnd": 84.69,
+      "pauseAfterMs": 5,
+      "confidence": 0.66
     },
     {
       "word": "120",
-      "start": 69.95,
-      "end": 71.025,
-      "pauseAfterMs": 0
+      "start": 84.695,
+      "end": 86.63,
+      "spokenEnd": 86.05,
+      "pauseAfterMs": 580,
+      "confidence": 0.35
     },
     {
       "word": "billion",
-      "start": 71.025,
-      "end": 72.16,
-      "pauseAfterMs": 0
+      "start": 86.63,
+      "end": 87.6,
+      "spokenEnd": 87.12,
+      "pauseAfterMs": 480,
+      "confidence": 0.3
     },
     {
       "word": "parameters",
-      "start": 72.16,
-      "end": 73.105,
-      "pauseAfterMs": 0
+      "start": 87.6,
+      "end": 88.68,
+      "spokenEnd": 88.3,
+      "pauseAfterMs": 380,
+      "confidence": 0.48
     },
     {
       "word": "locally,",
-      "start": 73.105,
-      "end": 74.045,
-      "pauseAfterMs": 0
+      "start": 88.68,
+      "end": 89.16,
+      "spokenEnd": 89.16,
+      "pauseAfterMs": 0,
+      "confidence": 0
     },
     {
       "word": "as",
-      "start": 74.045,
-      "end": 74.68,
-      "pauseAfterMs": 0
+      "start": 89.16,
+      "end": 89.26,
+      "spokenEnd": 89.26,
+      "pauseAfterMs": 0,
+      "confidence": 0
     },
     {
       "word": "in",
-      "start": 74.68,
-      "end": 75.505,
-      "pauseAfterMs": 0
+      "start": 89.26,
+      "end": 89.395,
+      "spokenEnd": 89.35,
+      "pauseAfterMs": 45,
+      "confidence": 0
     },
     {
       "word": "on",
-      "start": 75.505,
-      "end": 76.15,
-      "pauseAfterMs": 0
+      "start": 89.395,
+      "end": 89.485,
+      "spokenEnd": 89.48,
+      "pauseAfterMs": 5,
+      "confidence": 0
     },
     {
       "word": "your",
-      "start": 76.15,
-      "end": 76.77,
-      "pauseAfterMs": 0
+      "start": 89.485,
+      "end": 89.64,
+      "spokenEnd": 89.64,
+      "pauseAfterMs": 0,
+      "confidence": 0.25
     },
     {
       "word": "laptop.",
-      "start": 76.77,
-      "end": 77.765,
-      "pauseAfterMs": 0
+      "start": 89.64,
+      "end": 89.84,
+      "spokenEnd": 89.81,
+      "pauseAfterMs": 30,
+      "confidence": 0
     },
     {
       "word": "No",
-      "start": 77.765,
-      "end": 78.495,
-      "pauseAfterMs": 0
+      "start": 89.84,
+      "end": 89.985,
+      "spokenEnd": 89.98,
+      "pauseAfterMs": 5,
+      "confidence": 0
     },
     {
       "word": "giant",
-      "start": 78.495,
-      "end": 79.185,
-      "pauseAfterMs": 0
+      "start": 89.985,
+      "end": 90.22,
+      "spokenEnd": 90.22,
+      "pauseAfterMs": 0,
+      "confidence": 0.19
     },
     {
       "word": "desktop",
-      "start": 79.185,
-      "end": 80.16,
-      "pauseAfterMs": 0
+      "start": 90.22,
+      "end": 90.41,
+      "spokenEnd": 90.41,
+      "pauseAfterMs": 0,
+      "confidence": 0
     },
     {
       "word": "workstation,",
-      "start": 80.16,
-      "end": 81.22,
-      "pauseAfterMs": 0
+      "start": 90.41,
+      "end": 90.78,
+      "spokenEnd": 90.78,
+      "pauseAfterMs": 0,
+      "confidence": 0
     },
     {
       "word": "no",
-      "start": 81.22,
-      "end": 81.76,
-      "pauseAfterMs": 0
+      "start": 90.78,
+      "end": 90.88,
+      "spokenEnd": 90.85,
+      "pauseAfterMs": 30,
+      "confidence": 0
     },
     {
       "word": "sending",
-      "start": 81.76,
-      "end": 82.175,
-      "pauseAfterMs": 0
+      "start": 90.88,
+      "end": 91.18,
+      "spokenEnd": 91.09,
+      "pauseAfterMs": 90,
+      "confidence": 0.14
     },
     {
       "word": "the",
-      "start": 82.175,
-      "end": 82.78,
-      "pauseAfterMs": 0
+      "start": 91.18,
+      "end": 91.28,
+      "spokenEnd": 91.28,
+      "pauseAfterMs": 0,
+      "confidence": 0
     },
     {
       "word": "entire",
-      "start": 82.78,
-      "end": 83.5,
-      "pauseAfterMs": 0
+      "start": 91.28,
+      "end": 91.42,
+      "spokenEnd": 91.42,
+      "pauseAfterMs": 0,
+      "confidence": 0
     },
     {
       "word": "model",
-      "start": 83.5,
-      "end": 84.015,
-      "pauseAfterMs": 0
+      "start": 91.42,
+      "end": 91.535,
+      "spokenEnd": 91.53,
+      "pauseAfterMs": 5,
+      "confidence": 0.1
     },
     {
       "word": "to",
-      "start": 84.015,
-      "end": 84.1,
-      "pauseAfterMs": 0
+      "start": 91.535,
+      "end": 91.615,
+      "spokenEnd": 91.61,
+      "pauseAfterMs": 5,
+      "confidence": 0
     },
     {
       "word": "the",
-      "start": 84.1,
-      "end": 84.78,
-      "pauseAfterMs": 0
+      "start": 91.615,
+      "end": 91.78,
+      "spokenEnd": 91.75,
+      "pauseAfterMs": 30,
+      "confidence": 0
     },
     {
       "word": "cloud.",
-      "start": 84.78,
-      "end": 85.88,
-      "pauseAfterMs": 0
+      "start": 91.78,
+      "end": 91.9,
+      "spokenEnd": 91.89,
+      "pauseAfterMs": 10,
+      "confidence": 0
     },
     {
       "word": "And",
-      "start": 85.88,
-      "end": 86.63,
-      "pauseAfterMs": 0
+      "start": 91.9,
+      "end": 91.97,
+      "spokenEnd": 91.97,
+      "pauseAfterMs": 0,
+      "confidence": 0
     },
     {
       "word": "Microsoft",
-      "start": 86.63,
-      "end": 87.42,
-      "pauseAfterMs": 0
+      "start": 91.97,
+      "end": 92.28,
+      "spokenEnd": 92.28,
+      "pauseAfterMs": 0,
+      "confidence": 0
     },
     {
       "word": "didn't",
-      "start": 87.42,
-      "end": 88.035,
-      "pauseAfterMs": 0
+      "start": 92.28,
+      "end": 92.46,
+      "spokenEnd": 92.46,
+      "pauseAfterMs": 0,
+      "confidence": 0.2
     },
     {
       "word": "exactly",
-      "start": 88.035,
-      "end": 88.13,
-      "pauseAfterMs": 0
+      "start": 92.46,
+      "end": 92.64,
+      "spokenEnd": 92.64,
+      "pauseAfterMs": 0,
+      "confidence": 0.01
     },
     {
       "word": "HDMI,",
-      "start": 88.13,
-      "end": 88.61,
-      "pauseAfterMs": 0
+      "start": 92.64,
+      "end": 92.74,
+      "spokenEnd": 92.73,
+      "pauseAfterMs": 10,
+      "confidence": 0
     },
     {
       "word": "put",
-      "start": 88.61,
-      "end": 88.735,
-      "pauseAfterMs": 0
+      "start": 92.74,
+      "end": 92.82,
+      "spokenEnd": 92.82,
+      "pauseAfterMs": 0,
+      "confidence": 0.33
     },
     {
       "word": "USBA",
-      "start": 88.735,
-      "end": 89.05,
-      "pauseAfterMs": 0
+      "start": 92.82,
+      "end": 92.96,
+      "spokenEnd": 92.93,
+      "pauseAfterMs": 30,
+      "confidence": 0
     },
     {
       "word": "all",
-      "start": 89.05,
-      "end": 89.395,
-      "pauseAfterMs": 0
+      "start": 92.96,
+      "end": 93.08,
+      "spokenEnd": 93.05,
+      "pauseAfterMs": 30,
+      "confidence": 0
     },
     {
       "word": "of",
-      "start": 89.395,
-      "end": 89.61,
-      "pauseAfterMs": 0
+      "start": 93.08,
+      "end": 93.14,
+      "spokenEnd": 93.14,
+      "pauseAfterMs": 0,
+      "confidence": 0
     },
     {
       "word": "this",
-      "start": 89.61,
-      "end": 89.87,
-      "pauseAfterMs": 0
+      "start": 93.14,
+      "end": 93.24,
+      "spokenEnd": 93.23,
+      "pauseAfterMs": 10,
+      "confidence": 0.22
     },
     {
       "word": "and",
-      "start": 89.87,
-      "end": 89.985,
-      "pauseAfterMs": 0
+      "start": 93.24,
+      "end": 93.36,
+      "spokenEnd": 93.33,
+      "pauseAfterMs": 30,
+      "confidence": 0.33
     },
     {
       "word": "USBC,",
-      "start": 89.985,
-      "end": 91.97,
-      "pauseAfterMs": 0
+      "start": 93.36,
+      "end": 93.52,
+      "spokenEnd": 93.51,
+      "pauseAfterMs": 10,
+      "confidence": 0
     },
     {
       "word": "all",
-      "start": 91.97,
-      "end": 92.2,
-      "pauseAfterMs": 0
+      "start": 93.52,
+      "end": 93.61,
+      "spokenEnd": 93.61,
+      "pauseAfterMs": 0,
+      "confidence": 0
     },
     {
       "word": "in",
-      "start": 92.2,
-      "end": 92.28,
-      "pauseAfterMs": 0
+      "start": 93.61,
+      "end": 93.7,
+      "spokenEnd": 93.7,
+      "pauseAfterMs": 0,
+      "confidence": 0
     },
     {
       "word": "a",
-      "start": 92.28,
-      "end": 92.605,
-      "pauseAfterMs": 0
+      "start": 93.7,
+      "end": 93.74,
+      "spokenEnd": 93.74,
+      "pauseAfterMs": 0,
+      "confidence": 0
     },
     {
       "word": "laptop",
-      "start": 92.605,
-      "end": 92.825,
-      "pauseAfterMs": 0
+      "start": 93.74,
+      "end": 93.86,
+      "spokenEnd": 93.86,
+      "pauseAfterMs": 0,
+      "confidence": 0
     },
     {
       "word": "weighing",
-      "start": 92.825,
-      "end": 93.43,
-      "pauseAfterMs": 0
+      "start": 93.86,
+      "end": 94.06,
+      "spokenEnd": 94.06,
+      "pauseAfterMs": 0,
+      "confidence": 0.01
     },
     {
       "word": "under",
-      "start": 93.43,
-      "end": 93.705,
-      "pauseAfterMs": 0
+      "start": 94.06,
+      "end": 94.2,
+      "spokenEnd": 94.19,
+      "pauseAfterMs": 10,
+      "confidence": 0.04
     },
     {
       "word": "4.5",
-      "start": 93.705,
-      "end": 94.475,
-      "pauseAfterMs": 0
+      "start": 94.2,
+      "end": 94.845,
+      "spokenEnd": 94.84,
+      "pauseAfterMs": 5,
+      "confidence": 0.5
     },
     {
       "word": "pounds.",
-      "start": 94.475,
-      "end": 95.82,
-      "pauseAfterMs": 0
+      "start": 94.845,
+      "end": 95.905,
+      "spokenEnd": 95.25,
+      "pauseAfterMs": 655,
+      "confidence": 0.98
     },
     {
       "word": "They",
-      "start": 95.82,
+      "start": 95.905,
       "end": 96.12,
-      "pauseAfterMs": 0
+      "spokenEnd": 96.12,
+      "pauseAfterMs": 0,
+      "confidence": 0.03
     },
     {
       "word": "even",
       "start": 96.12,
       "end": 96.355,
-      "pauseAfterMs": 0
+      "spokenEnd": 96.35,
+      "pauseAfterMs": 5,
+      "confidence": 0.94
     },
     {
       "word": "made",
       "start": 96.355,
-      "end": 96.465,
-      "pauseAfterMs": 0
+      "end": 96.54,
+      "spokenEnd": 96.54,
+      "pauseAfterMs": 0,
+      "confidence": 0.82
     },
     {
       "word": "the",
-      "start": 96.465,
-      "end": 96.98,
-      "pauseAfterMs": 0
+      "start": 96.54,
+      "end": 96.74,
+      "spokenEnd": 96.74,
+      "pauseAfterMs": 0,
+      "confidence": 0.93
     },
     {
       "word": "USBC",
-      "start": 96.98,
-      "end": 97.59,
-      "pauseAfterMs": 0
+      "start": 96.74,
+      "end": 97.325,
+      "spokenEnd": 97.3,
+      "pauseAfterMs": 25,
+      "confidence": 0.87
     },
     {
       "word": "charger",
-      "start": 97.59,
-      "end": 97.95,
-      "pauseAfterMs": 0
+      "start": 97.325,
+      "end": 97.78,
+      "spokenEnd": 97.78,
+      "pauseAfterMs": 0,
+      "confidence": 0.86
     },
     {
       "word": "magnetic.",
-      "start": 97.95,
-      "end": 99.395,
-      "pauseAfterMs": 0
+      "start": 97.78,
+      "end": 99,
+      "spokenEnd": 98.29,
+      "pauseAfterMs": 710,
+      "confidence": 0.95
     },
     {
       "word": "But",
-      "start": 99.395,
-      "end": 99.745,
-      "pauseAfterMs": 0
+      "start": 99,
+      "end": 99.2,
+      "spokenEnd": 99.13,
+      "pauseAfterMs": 70,
+      "confidence": 0.71
     },
     {
       "word": "then,",
-      "start": 99.745,
-      "end": 100.52,
-      "pauseAfterMs": 0
+      "start": 99.2,
+      "end": 99.965,
+      "spokenEnd": 99.65,
+      "pauseAfterMs": 315,
+      "confidence": 0.94
     },
     {
       "word": "there's",
-      "start": 100.52,
-      "end": 100.84,
-      "pauseAfterMs": 0
+      "start": 99.965,
+      "end": 100.28,
+      "spokenEnd": 100.25,
+      "pauseAfterMs": 30,
+      "confidence": 0.95
     },
     {
       "word": "the",
-      "start": 100.84,
-      "end": 101.04,
-      "pauseAfterMs": 0
+      "start": 100.28,
+      "end": 100.435,
+      "spokenEnd": 100.39,
+      "pauseAfterMs": 45,
+      "confidence": 0.99
     },
     {
       "word": "price.",
-      "start": 101.04,
-      "end": 102.015,
-      "pauseAfterMs": 0
+      "start": 100.435,
+      "end": 101.58,
+      "spokenEnd": 100.75,
+      "pauseAfterMs": 830,
+      "confidence": 1
     },
     {
       "word": "The",
-      "start": 102.015,
-      "end": 102.645,
-      "pauseAfterMs": 0
+      "start": 101.58,
+      "end": 101.76,
+      "spokenEnd": 101.69,
+      "pauseAfterMs": 70,
+      "confidence": 0.99
     },
     {
       "word": "Surface",
-      "start": 102.645,
-      "end": 103.07,
-      "pauseAfterMs": 0
+      "start": 101.76,
+      "end": 102.195,
+      "spokenEnd": 102.14,
+      "pauseAfterMs": 55,
+      "confidence": 0.99
     },
     {
       "word": "Laptop",
-      "start": 103.07,
-      "end": 103.8,
-      "pauseAfterMs": 0
+      "start": 102.195,
+      "end": 102.73,
+      "spokenEnd": 102.61,
+      "pauseAfterMs": 120,
+      "confidence": 0.99
     },
     {
       "word": "Ultra",
-      "start": 103.8,
-      "end": 104.21,
-      "pauseAfterMs": 0
+      "start": 102.73,
+      "end": 103.3,
+      "spokenEnd": 103.17,
+      "pauseAfterMs": 130,
+      "confidence": 0.96
     },
     {
       "word": "starts",
-      "start": 104.21,
-      "end": 104.735,
-      "pauseAfterMs": 0
+      "start": 103.3,
+      "end": 103.615,
+      "spokenEnd": 103.59,
+      "pauseAfterMs": 25,
+      "confidence": 0.97
     },
     {
       "word": "at",
-      "start": 104.735,
-      "end": 106.515,
-      "pauseAfterMs": 0
+      "start": 103.615,
+      "end": 103.8,
+      "spokenEnd": 103.71,
+      "pauseAfterMs": 90,
+      "confidence": 1
     },
     {
       "word": "$2,599.",
-      "start": 106.515,
-      "end": 107.275,
-      "pauseAfterMs": 0
+      "start": 103.8,
+      "end": 107.04,
+      "spokenEnd": 106.39,
+      "pauseAfterMs": 650,
+      "confidence": 0.88
     },
     {
       "word": "And",
-      "start": 107.275,
-      "end": 107.555,
-      "pauseAfterMs": 0
+      "start": 107.04,
+      "end": 107.275,
+      "spokenEnd": 107.27,
+      "pauseAfterMs": 5,
+      "confidence": 0.99
     },
     {
       "word": "if",
-      "start": 107.555,
-      "end": 107.67,
-      "pauseAfterMs": 0
+      "start": 107.275,
+      "end": 107.44,
+      "spokenEnd": 107.39,
+      "pauseAfterMs": 50,
+      "confidence": 0.98
     },
     {
       "word": "you",
-      "start": 107.67,
-      "end": 107.905,
-      "pauseAfterMs": 0
+      "start": 107.44,
+      "end": 107.555,
+      "spokenEnd": 107.55,
+      "pauseAfterMs": 5,
+      "confidence": 1
     },
     {
       "word": "want",
-      "start": 107.905,
-      "end": 108.185,
-      "pauseAfterMs": 0
+      "start": 107.555,
+      "end": 107.74,
+      "spokenEnd": 107.71,
+      "pauseAfterMs": 30,
+      "confidence": 0.91
     },
     {
       "word": "that",
-      "start": 108.185,
-      "end": 108.79,
-      "pauseAfterMs": 0
+      "start": 107.74,
+      "end": 107.905,
+      "spokenEnd": 107.87,
+      "pauseAfterMs": 35,
+      "confidence": 0.97
     },
     {
       "word": "ridiculous",
-      "start": 108.79,
-      "end": 109.975,
-      "pauseAfterMs": 0
+      "start": 107.905,
+      "end": 108.79,
+      "spokenEnd": 108.65,
+      "pauseAfterMs": 140,
+      "confidence": 0.98
     },
     {
       "word": "128",
-      "start": 109.975,
-      "end": 110.445,
-      "pauseAfterMs": 0
+      "start": 108.79,
+      "end": 109.72,
+      "spokenEnd": 109.67,
+      "pauseAfterMs": 50,
+      "confidence": 0.97
     },
     {
       "word": "gigabyte",
-      "start": 110.445,
-      "end": 111.215,
-      "pauseAfterMs": 0
+      "start": 109.72,
+      "end": 110.18,
+      "spokenEnd": 110.15,
+      "pauseAfterMs": 30,
+      "confidence": 0.75
     },
     {
       "word": "configuration,",
-      "start": 111.215,
-      "end": 112.255,
-      "pauseAfterMs": 0
+      "start": 110.18,
+      "end": 111.36,
+      "spokenEnd": 110.96,
+      "pauseAfterMs": 400,
+      "confidence": 0.99
     },
     {
       "word": "you're",
-      "start": 112.255,
-      "end": 112.405,
-      "pauseAfterMs": 0
+      "start": 111.36,
+      "end": 111.575,
+      "spokenEnd": 111.57,
+      "pauseAfterMs": 5,
+      "confidence": 0.84
     },
     {
       "word": "looking",
-      "start": 112.405,
-      "end": 112.695,
-      "pauseAfterMs": 0
+      "start": 111.575,
+      "end": 111.88,
+      "spokenEnd": 111.87,
+      "pauseAfterMs": 10,
+      "confidence": 0.97
     },
     {
       "word": "at",
-      "start": 112.695,
-      "end": 115.735,
-      "pauseAfterMs": 0
+      "start": 111.88,
+      "end": 112.06,
+      "spokenEnd": 111.93,
+      "pauseAfterMs": 130,
+      "confidence": 1
     },
     {
       "word": "$5,899.99.",
-      "start": 115.735,
-      "end": 116.725,
-      "pauseAfterMs": 0
+      "start": 112.06,
+      "end": 116.6,
+      "spokenEnd": 115.77,
+      "pauseAfterMs": 830,
+      "confidence": 0.78
     },
     {
       "word": "So,",
-      "start": 116.725,
-      "end": 117.255,
-      "pauseAfterMs": 0
+      "start": 116.6,
+      "end": 116.92,
+      "spokenEnd": 116.92,
+      "pauseAfterMs": 0,
+      "confidence": 0.49
     },
     {
       "word": "yeah.",
-      "start": 117.255,
-      "end": 117.955,
-      "pauseAfterMs": 0
+      "start": 116.92,
+      "end": 117.12,
+      "spokenEnd": 117.11,
+      "pauseAfterMs": 10,
+      "confidence": 0.29
     },
     {
       "word": "that",
-      "start": 117.955,
-      "end": 118.21,
-      "pauseAfterMs": 0
+      "start": 117.12,
+      "end": 117.665,
+      "spokenEnd": 117.21,
+      "pauseAfterMs": 455,
+      "confidence": 0.03
     },
     {
       "word": "Microsoft",
-      "start": 118.21,
-      "end": 118.375,
-      "pauseAfterMs": 0
+      "start": 117.665,
+      "end": 118.14,
+      "spokenEnd": 118.13,
+      "pauseAfterMs": 10,
+      "confidence": 0.76
     },
     {
       "word": "basically",
-      "start": 118.375,
-      "end": 118.6,
-      "pauseAfterMs": 0
+      "start": 118.14,
+      "end": 118.36,
+      "spokenEnd": 118.35,
+      "pauseAfterMs": 10,
+      "confidence": 0
     },
     {
       "word": "basically",
-      "start": 118.6,
-      "end": 118.72,
-      "pauseAfterMs": 0
+      "start": 118.36,
+      "end": 118.84,
+      "spokenEnd": 118.84,
+      "pauseAfterMs": 0,
+      "confidence": 0.8
     },
     {
       "word": "built",
-      "start": 118.72,
-      "end": 119.075,
-      "pauseAfterMs": 0
+      "start": 118.84,
+      "end": 119.1,
+      "spokenEnd": 119.09,
+      "pauseAfterMs": 10,
+      "confidence": 0.99
     },
     {
       "word": "a",
-      "start": 119.075,
-      "end": 119.29,
-      "pauseAfterMs": 0
+      "start": 119.1,
+      "end": 119.14,
+      "spokenEnd": 119.14,
+      "pauseAfterMs": 0,
+      "confidence": 0
     },
     {
       "word": "built",
-      "start": 119.29,
-      "end": 119.415,
-      "pauseAfterMs": 0
+      "start": 119.14,
+      "end": 119.29,
+      "spokenEnd": 119.25,
+      "pauseAfterMs": 40,
+      "confidence": 0
     },
     {
       "word": "portable",
-      "start": 119.415,
-      "end": 119.555,
-      "pauseAfterMs": 0
+      "start": 119.29,
+      "end": 119.82,
+      "spokenEnd": 119.82,
+      "pauseAfterMs": 0,
+      "confidence": 0.99
     },
     {
       "word": "a",
-      "start": 119.555,
-      "end": 119.825,
-      "pauseAfterMs": 0
+      "start": 119.82,
+      "end": 119.9,
+      "spokenEnd": 119.9,
+      "pauseAfterMs": 0,
+      "confidence": 0
     },
     {
       "word": "Nvidia",
-      "start": 119.825,
-      "end": 120.06,
-      "pauseAfterMs": 0
+      "start": 119.9,
+      "end": 120.28,
+      "spokenEnd": 120.28,
+      "pauseAfterMs": 0,
+      "confidence": 0.8
     },
     {
       "word": "portable",
-      "start": 120.06,
-      "end": 120.24,
-      "pauseAfterMs": 0
+      "start": 120.28,
+      "end": 120.595,
+      "spokenEnd": 120.59,
+      "pauseAfterMs": 5,
+      "confidence": 0.12
     },
     {
       "word": "AI",
-      "start": 120.24,
-      "end": 120.595,
-      "pauseAfterMs": 0
+      "start": 120.595,
+      "end": 120.84,
+      "spokenEnd": 120.84,
+      "pauseAfterMs": 0,
+      "confidence": 0.59
     },
     {
       "word": "workstation",
-      "start": 120.595,
-      "end": 121.7,
-      "pauseAfterMs": 0
+      "start": 120.84,
+      "end": 121.9,
+      "spokenEnd": 121.63,
+      "pauseAfterMs": 270,
+      "confidence": 0.97
     },
     {
       "word": "and",
-      "start": 121.7,
-      "end": 121.835,
-      "pauseAfterMs": 0
+      "start": 121.9,
+      "end": 122.04,
+      "spokenEnd": 122.03,
+      "pauseAfterMs": 10,
+      "confidence": 0.99
     },
     {
       "word": "disguised",
-      "start": 121.835,
-      "end": 122.545,
-      "pauseAfterMs": 0
+      "start": 122.04,
+      "end": 122.72,
+      "spokenEnd": 122.72,
+      "pauseAfterMs": 0,
+      "confidence": 0.97
     },
     {
       "word": "it",
-      "start": 122.545,
-      "end": 122.625,
-      "pauseAfterMs": 0
+      "start": 122.72,
+      "end": 122.85,
+      "spokenEnd": 122.78,
+      "pauseAfterMs": 70,
+      "confidence": 1
     },
     {
       "word": "as",
-      "start": 122.625,
-      "end": 122.85,
-      "pauseAfterMs": 0
+      "start": 122.85,
+      "end": 123.06,
+      "spokenEnd": 122.95,
+      "pauseAfterMs": 110,
+      "confidence": 0.92
     },
     {
       "word": "a",
-      "start": 122.85,
-      "end": 122.99,
-      "pauseAfterMs": 0
+      "start": 123.06,
+      "end": 123.14,
+      "spokenEnd": 123.12,
+      "pauseAfterMs": 20,
+      "confidence": 0.77
     },
     {
       "word": "surface",
-      "start": 122.99,
-      "end": 123.315,
-      "pauseAfterMs": 0
+      "start": 123.14,
+      "end": 123.525,
+      "spokenEnd": 123.51,
+      "pauseAfterMs": 15,
+      "confidence": 0.97
     },
     {
       "word": "laptop.",
-      "start": 123.315,
-      "end": 124.79,
-      "pauseAfterMs": 0
+      "start": 123.525,
+      "end": 124.78,
+      "spokenEnd": 124.01,
+      "pauseAfterMs": 770,
+      "confidence": 0.9
     },
     {
       "word": "The",
-      "start": 124.79,
-      "end": 125.16,
-      "pauseAfterMs": 0
+      "start": 124.78,
+      "end": 124.9,
+      "spokenEnd": 124.9,
+      "pauseAfterMs": 0,
+      "confidence": 0.77
     },
     {
       "word": "only",
-      "start": 125.16,
-      "end": 125.275,
-      "pauseAfterMs": 0
+      "start": 124.9,
+      "end": 125.14,
+      "spokenEnd": 125.07,
+      "pauseAfterMs": 70,
+      "confidence": 0.13
     },
     {
       "word": "question",
-      "start": 125.275,
-      "end": 125.605,
-      "pauseAfterMs": 0
+      "start": 125.14,
+      "end": 125.6,
+      "spokenEnd": 125.6,
+      "pauseAfterMs": 0,
+      "confidence": 0.99
     },
     {
       "word": "is,",
-      "start": 125.605,
+      "start": 125.6,
       "end": 126.155,
-      "pauseAfterMs": 0
+      "spokenEnd": 125.72,
+      "pauseAfterMs": 435,
+      "confidence": 0.93
     },
     {
       "word": "who",
       "start": 126.155,
-      "end": 126.445,
-      "pauseAfterMs": 0
+      "end": 126.54,
+      "spokenEnd": 126.39,
+      "pauseAfterMs": 150,
+      "confidence": 0.96
     },
     {
       "word": "actually",
-      "start": 126.445,
-      "end": 127.105,
-      "pauseAfterMs": 0
+      "start": 126.54,
+      "end": 127.1,
+      "spokenEnd": 127.1,
+      "pauseAfterMs": 0,
+      "confidence": 1
     },
     {
       "word": "needs",
-      "start": 127.105,
+      "start": 127.1,
       "end": 127.43,
-      "pauseAfterMs": 0
+      "spokenEnd": 127.41,
+      "pauseAfterMs": 20,
+      "confidence": 0.61
     },
     {
       "word": "this",
       "start": 127.43,
-      "end": 127.6,
-      "pauseAfterMs": 0
+      "end": 127.68,
+      "spokenEnd": 127.63,
+      "pauseAfterMs": 50,
+      "confidence": 0.93
     },
     {
       "word": "much",
-      "start": 127.6,
-      "end": 127.795,
-      "pauseAfterMs": 0
+      "start": 127.68,
+      "end": 127.89,
+      "spokenEnd": 127.85,
+      "pauseAfterMs": 40,
+      "confidence": 1
     },
     {
       "word": "laptop?",
-      "start": 127.795,
-      "end": 131.6,
-      "pauseAfterMs": 0
+      "start": 127.89,
+      "end": 128.52,
+      "spokenEnd": 128.37,
+      "pauseAfterMs": 0,
+      "confidence": 0.9
     }
   ],
   "sentences": [
@@ -2834,23 +3448,23 @@
       "text": "Microsoft just built a Surface laptop that can cost almost six thousand dollars.",
       "wordStart": 0,
       "wordEnd": 12,
-      "start": 0.03,
-      "end": 5.3
+      "start": 0.17,
+      "end": 6
     },
     {
       "index": 1,
       "text": "And somehow, the price isn't even the craziest part.",
       "wordStart": 13,
       "wordEnd": 21,
-      "start": 5.3,
-      "end": 9.665
+      "start": 6,
+      "end": 10.06
     },
     {
       "index": 2,
       "text": "Microsoft teamed up with Nvidia to build the new Surface Laptop Ultra,",
       "wordStart": 22,
       "wordEnd": 33,
-      "start": 9.665,
+      "start": 10.06,
       "end": 14.18
     },
     {
@@ -2867,213 +3481,225 @@
       "wordStart": 41,
       "wordEnd": 50,
       "start": 17.41,
-      "end": 20.93
+      "end": 21.255
     },
     {
       "index": 5,
       "text": "Instead of having regular RAM over here, and separate graphics memory over there,",
       "wordStart": 51,
       "wordEnd": 63,
-      "start": 20.93,
-      "end": 25.82
+      "start": 21.255,
+      "end": 26.17
     },
     {
       "index": 6,
-      "text": "the CPU and Nvidia GPU can share the same 128 pool of memory.",
+      "text": "the CPU and Nvidia GPU can share the same",
       "wordStart": 64,
-      "wordEnd": 76,
-      "start": 25.82,
-      "end": 28.74
+      "wordEnd": 72,
+      "start": 26.17,
+      "end": 32.1
     },
     {
       "index": 7,
-      "text": "gigabytes of it.",
-      "wordStart": 77,
-      "wordEnd": 79,
-      "start": 28.74,
-      "end": 29.785
+      "text": "128 pool of memory.",
+      "wordStart": 73,
+      "wordEnd": 76,
+      "start": 32.1,
+      "end": 33.46
     },
     {
       "index": 8,
-      "text": "Now, Microsoft that does not mean you're getting an Nvidia graphics card with 128 gigs of VRAM.",
-      "wordStart": 80,
-      "wordEnd": 96,
-      "start": 29.785,
-      "end": 34.95
+      "text": "gigabytes of it.",
+      "wordStart": 77,
+      "wordEnd": 79,
+      "start": 33.46,
+      "end": 33.91
     },
     {
       "index": 9,
-      "text": "The actual GPU is a Blackwell RTX GPU, with up to 6,144 CUDA cores.",
-      "wordStart": 97,
-      "wordEnd": 110,
-      "start": 34.95,
-      "end": 40.095
+      "text": "Now, Microsoft that does not mean you're getting an Nvidia graphics card with 128 gigs of VRAM.",
+      "wordStart": 80,
+      "wordEnd": 96,
+      "start": 33.91,
+      "end": 40.33
     },
     {
       "index": 10,
-      "text": "But because it can access that huge shared memory pool,",
-      "wordStart": 111,
-      "wordEnd": 120,
-      "start": 40.095,
-      "end": 43.175
+      "text": "The actual GPU is a Blackwell RTX GPU, with up to 6,144 CUDA cores.",
+      "wordStart": 97,
+      "wordEnd": 110,
+      "start": 40.33,
+      "end": 47.54
     },
     {
       "index": 11,
-      "text": "it can handle workloads that normally wouldn't even fit into a laptop GPU's memory.",
-      "wordStart": 121,
-      "wordEnd": 134,
-      "start": 43.175,
-      "end": 47.795
+      "text": "But because it can access that huge shared memory pool,",
+      "wordStart": 111,
+      "wordEnd": 120,
+      "start": 47.54,
+      "end": 50.96
     },
     {
       "index": 12,
-      "text": "And that's where things get ridiculous.",
-      "wordStart": 135,
-      "wordEnd": 140,
-      "start": 47.795,
-      "end": 49.98
+      "text": "it can handle workloads that normally wouldn't even fit into a laptop GPU's memory.",
+      "wordStart": 121,
+      "wordEnd": 134,
+      "start": 50.96,
+      "end": 56.025
     },
     {
       "index": 13,
-      "text": "Nvidia says RTX Spark delivers up to one petaflop of AI inference performance.",
-      "wordStart": 141,
-      "wordEnd": 153,
-      "start": 49.98,
-      "end": 54.735
+      "text": "And that's where things get ridiculous.",
+      "wordStart": 135,
+      "wordEnd": 140,
+      "start": 56.025,
+      "end": 58.92
     },
     {
       "index": 14,
-      "text": "That's about five times faster than the previous generation.",
-      "wordStart": 154,
-      "wordEnd": 162,
-      "start": 54.735,
-      "end": 57.32
+      "text": "Nvidia says RTX Spark delivers up to one petaflop of AI inference performance.",
+      "wordStart": 141,
+      "wordEnd": 153,
+      "start": 58.92,
+      "end": 63.885
     },
     {
       "index": 15,
-      "text": "So if you're a developer .",
-      "wordStart": 163,
-      "wordEnd": 168,
-      "start": 57.32,
-      "end": 58.3
+      "text": "That's about five times faster than the previous generation.",
+      "wordStart": 154,
+      "wordEnd": 162,
+      "start": 63.885,
+      "end": 69.06
     },
     {
       "index": 16,
-      "text": "building and running NVIDIA complex says AI models RTX Spark",
-      "wordStart": 169,
-      "wordEnd": 178,
-      "start": 58.3,
-      "end": 61.62
+      "text": "So if you're a developer .",
+      "wordStart": 163,
+      "wordEnd": 168,
+      "start": 69.06,
+      "end": 70.78
     },
     {
       "index": 17,
-      "text": "delivers up to one petaflop of AI performance, and can",
-      "wordStart": 179,
-      "wordEnd": 188,
-      "start": 61.62,
-      "end": 67.035
+      "text": "building and running NVIDIA complex says AI models RTX Spark",
+      "wordStart": 169,
+      "wordEnd": 178,
+      "start": 70.76,
+      "end": 76.34
     },
     {
       "index": 18,
-      "text": "run AI models with around 120 billion parameters locally, as in on your laptop.",
-      "wordStart": 189,
-      "wordEnd": 202,
-      "start": 67.035,
-      "end": 77.765
+      "text": "delivers up to one petaflop of AI performance, and can run AI models with",
+      "wordStart": 179,
+      "wordEnd": 192,
+      "start": 76.34,
+      "end": 84.34
     },
     {
       "index": 19,
-      "text": "No giant desktop workstation, no sending the entire model to the cloud.",
-      "wordStart": 203,
-      "wordEnd": 214,
-      "start": 77.765,
-      "end": 85.88
+      "text": "around 120 billion parameters locally, as in on your laptop.",
+      "wordStart": 193,
+      "wordEnd": 202,
+      "start": 84.34,
+      "end": 89.84
     },
     {
       "index": 20,
-      "text": "And Microsoft didn't exactly HDMI, put USBA all of this and USBC,",
-      "wordStart": 215,
-      "wordEnd": 226,
-      "start": 85.88,
-      "end": 91.97
+      "text": "No giant desktop workstation, no sending the entire model to the cloud.",
+      "wordStart": 203,
+      "wordEnd": 214,
+      "start": 89.84,
+      "end": 91.9
     },
     {
       "index": 21,
-      "text": "all in a laptop weighing under 4.5 pounds.",
-      "wordStart": 227,
-      "wordEnd": 234,
-      "start": 91.97,
-      "end": 95.82
+      "text": "And Microsoft didn't exactly HDMI, put USBA all of this and USBC,",
+      "wordStart": 215,
+      "wordEnd": 226,
+      "start": 91.9,
+      "end": 93.52
     },
     {
       "index": 22,
-      "text": "They even made the USBC charger magnetic.",
-      "wordStart": 235,
-      "wordEnd": 241,
-      "start": 95.82,
-      "end": 99.395
+      "text": "all in a laptop weighing under 4.5 pounds.",
+      "wordStart": 227,
+      "wordEnd": 234,
+      "start": 93.52,
+      "end": 95.905
     },
     {
       "index": 23,
-      "text": "But then, there's the price.",
-      "wordStart": 242,
-      "wordEnd": 246,
-      "start": 99.395,
-      "end": 102.015
+      "text": "They even made the USBC charger magnetic.",
+      "wordStart": 235,
+      "wordEnd": 241,
+      "start": 95.905,
+      "end": 99
     },
     {
       "index": 24,
-      "text": "The Surface Laptop Ultra starts at $2,599.",
-      "wordStart": 247,
-      "wordEnd": 253,
-      "start": 102.015,
-      "end": 107.275
+      "text": "But then, there's the price.",
+      "wordStart": 242,
+      "wordEnd": 246,
+      "start": 99,
+      "end": 101.58
     },
     {
       "index": 25,
-      "text": "And if you want that ridiculous 128 gigabyte configuration, you're looking at $5,899.99.",
-      "wordStart": 254,
-      "wordEnd": 266,
-      "start": 107.275,
-      "end": 116.725
+      "text": "The Surface Laptop Ultra starts at $2,599.",
+      "wordStart": 247,
+      "wordEnd": 253,
+      "start": 101.58,
+      "end": 107.04
     },
     {
       "index": 26,
-      "text": "So, yeah.",
-      "wordStart": 267,
-      "wordEnd": 268,
-      "start": 116.725,
-      "end": 117.955
+      "text": "And if you want that ridiculous 128 gigabyte configuration, you're looking at $5,899.99.",
+      "wordStart": 254,
+      "wordEnd": 266,
+      "start": 107.04,
+      "end": 116.6
     },
     {
       "index": 27,
-      "text": "that Microsoft basically basically built a built portable a Nvidia",
-      "wordStart": 269,
-      "wordEnd": 278,
-      "start": 117.955,
-      "end": 120.06
+      "text": "So, yeah.",
+      "wordStart": 267,
+      "wordEnd": 268,
+      "start": 116.6,
+      "end": 117.12
     },
     {
       "index": 28,
-      "text": "portable AI workstation and disguised it as a surface laptop.",
-      "wordStart": 279,
-      "wordEnd": 288,
-      "start": 120.06,
-      "end": 124.79
+      "text": "that Microsoft basically basically built a built portable a Nvidia portable AI workstation",
+      "wordStart": 269,
+      "wordEnd": 281,
+      "start": 117.12,
+      "end": 121.9
     },
     {
       "index": 29,
+      "text": "and disguised it as a surface laptop.",
+      "wordStart": 282,
+      "wordEnd": 288,
+      "start": 121.9,
+      "end": 124.78
+    },
+    {
+      "index": 30,
       "text": "The only question is, who actually needs this much laptop?",
       "wordStart": 289,
       "wordEnd": 298,
-      "start": 124.79,
-      "end": 131.6
+      "start": 124.78,
+      "end": 128.52
     }
   ],
   "alignment": {
-    "anchored": 299,
-    "interpolated": 0,
+    "anchored": 298,
+    "interpolated": 1,
     "total": 299,
-    "collisionsFixed": 0
+    "collisionsFixed": 0,
+    "method": "ctc-forced",
+    "avgConfidence": 0.68,
+    "lowConfidence": 77,
+    "refined": 124
   }
 }

@@ -20,7 +20,6 @@ export async function GET() {
     model: row.model,
     toleranceMs: row.toleranceMs,
     allowSimulate: row.allowSimulate,
-    gapless: row.gapless,
   });
 }
 
@@ -44,7 +43,6 @@ export async function POST(req: Request) {
       toleranceMs: clamp(body?.toleranceMs, 150, 600, 350),
       model: typeof body?.model === "string" ? body.model : row.model,
       allowSimulate: typeof body?.allowSimulate === "boolean" ? body.allowSimulate : row.allowSimulate,
-      gapless: typeof body?.gapless === "boolean" ? body.gapless : row.gapless,
     })
     .where(eq(appSettings.id, 1));
   const [fresh] = await db.select().from(appSettings).where(eq(appSettings.id, 1));
@@ -54,6 +52,5 @@ export async function POST(req: Request) {
     model: fresh.model,
     toleranceMs: fresh.toleranceMs,
     allowSimulate: fresh.allowSimulate,
-    gapless: fresh.gapless,
   });
 }

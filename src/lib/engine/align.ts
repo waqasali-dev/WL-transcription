@@ -14,8 +14,14 @@ export function normalizeClipWords(
       start: round3(Math.max(0, w.start + clipStartSec)),
       end: round3(Math.max(w.start + clipStartSec, w.end + clipStartSec)),
       pauseAfterMs: 0,
-    }))
-    .sort((a, b) => a.start - b.start);
+    }));
+  // NEVER re-sort by LLM timestamps — Gemini's TEXT order is reliable, its
+  // timestamps are not (sorting scrambled sentences like "HDMI, put USBA…").
+  // Clamp to non-decreasing instead; the acoustic aligner fixes real timing.
+  for (let i = 1; i < mapped.length; i++) {
+    if (mapped[i].start < mapped[i - 1].start) mapped[i].start = mapped[i - 1].start;
+    if (mapped[i].end < mapped[i].start) mapped[i].end = mapped[i].start;
+  }
 
   // bridge micro-pauses (< 20ms) so consecutive words are continuous
   for (let i = 0; i < mapped.length - 1; i++) {
@@ -102,11 +108,35 @@ export function measureCoverage(
   };
 }
 
-// ── Step 7: The 4-Pass Timestamp Matching Algorithm ─────────────────────────
+// ── Fallback aligner (used only if the acoustic model is unavailable) ───────
+// The old greedy "snap to nearest onset within ±350 ms" moved words onto the
+// wrong syllable (speech has ~3 onsets per word). Instead we estimate a
+// smoothed drift curve from robust local offsets, apply it, and only snap
+// when an onset sits within 60 ms of the drift-corrected time.
 export interface AlignmentResult {
   words: Word[];
   stats: AlignmentStats;
   collisionsFixed: number;
+}
+
+function median(xs: number[]): number {
+  if (!xs.length) return 0;
+  const s = [...xs].sort((a, b) => a - b);
+  const m = s.length >> 1;
+  return s.length % 2 ? s[m] : (s[m - 1] + s[m]) / 2;
+}
+
+function nearestOnset(onsets: number[], t: number): number {
+  let lo = 0;
+  let hi = onsets.length - 1;
+  while (lo < hi) {
+    const mid = (lo + hi) >> 1;
+    if (onsets[mid] < t) lo = mid + 1;
+    else hi = mid;
+  }
+  let best = lo;
+  if (lo > 0 && Math.abs(onsets[lo - 1] - t) < Math.abs(onsets[lo] - t)) best = lo - 1;
+  return best;
 }
 
 export function correctWordTimestamps(
@@ -115,112 +145,89 @@ export function correctWordTimestamps(
   { toleranceSec = 0.35 } = {}
 ): AlignmentResult {
   const total = words.length;
-  if (!onsets?.length || !total) {
-    return {
-      words: (words || []).map((w) => ({ ...w })),
-      stats: { anchored: 0, interpolated: total, total, collisionsFixed: 0 },
-      collisionsFixed: 0,
-    };
+  if (!total) {
+    return { words: [], stats: { anchored: 0, interpolated: 0, total: 0, collisionsFixed: 0, method: "onset-dp" }, collisionsFixed: 0 };
   }
+  const starts = words.map((w) => w.start);
+  const spokenEnds = words.map((w) => w.spokenEnd ?? w.end);
+  let anchored = 0;
 
-  const result = words.map((w) => ({ ...w, _anchor: false }));
-
-  // ── PASS 1: Greedy Forward Matching (anchor AI words to physical onsets) ──
-  let oi = 0;
-  for (let wi = 0; wi < result.length; wi++) {
-    const aiStart = words[wi].start;
-    while (oi < onsets.length && onsets[oi] < aiStart - toleranceSec) oi++;
-    let bestOi = -1;
-    let bestDist = Infinity;
-    for (let j = oi; j < onsets.length && onsets[j] <= aiStart + toleranceSec; j++) {
-      const dist = Math.abs(onsets[j] - aiStart);
-      if (dist < bestDist) {
-        bestDist = dist;
-        bestOi = j;
-      }
-    }
-    if (bestOi >= 0) {
-      result[wi].start = onsets[bestOi];
-      result[wi]._anchor = true;
-      oi = bestOi + 1;
-    }
-  }
-
-  // ── PASS 2: Proportional linear interpolation of unanchored words ─────────
-  const anchorIdxs = result.map((w, i) => (w._anchor ? i : -1)).filter((i) => i >= 0);
-
-  if (anchorIdxs.length > 0 && anchorIdxs[0] > 0) {
-    const ai = anchorIdxs[0];
-    const drift = result[ai].start - words[ai].start;
-    for (let i = 0; i < ai; i++) result[i].start = words[i].start + drift;
-  }
-  for (let a = 0; a < anchorIdxs.length - 1; a++) {
-    const from = anchorIdxs[a];
-    const to = anchorIdxs[a + 1];
-    if (to - from <= 1) continue;
-    const origFrom = words[from].start;
-    const origTo = words[to].start;
-    const corrFrom = result[from].start;
-    const corrTo = result[to].start;
-    const origRange = origTo - origFrom;
-    if (origRange > 0) {
-      for (let i = from + 1; i < to; i++) {
-        const ratio = (words[i].start - origFrom) / origRange;
-        result[i].start = corrFrom + ratio * (corrTo - corrFrom);
+  if (onsets.length) {
+    // 1. raw local offsets (nearest onset within tolerance)
+    const raw = starts.map((s) => {
+      const j = nearestOnset(onsets, s);
+      const d = onsets[j] - s;
+      return Math.abs(d) <= toleranceSec ? d : NaN;
+    });
+    // 2. smoothed drift = running median of offsets over ±8 words
+    const drift = starts.map((_, i) => {
+      const win: number[] = [];
+      for (let k = Math.max(0, i - 8); k <= Math.min(total - 1, i + 8); k++) if (Number.isFinite(raw[k])) win.push(raw[k]);
+      return win.length >= 3 ? median(win) : 0;
+    });
+    // 3. apply drift, then snap only to a very close, unused onset
+    const used = new Set<number>();
+    for (let i = 0; i < total; i++) {
+      const t = starts[i] + drift[i];
+      spokenEnds[i] += drift[i];
+      const j = nearestOnset(onsets, t);
+      if (Math.abs(onsets[j] - t) <= 0.06 && !used.has(j)) {
+        used.add(j);
+        starts[i] = onsets[j];
+        anchored++;
+      } else {
+        starts[i] = t;
       }
     }
   }
-  if (anchorIdxs.length > 0) {
-    const li = anchorIdxs[anchorIdxs.length - 1];
-    const drift = result[li].start - words[li].start;
-    for (let i = li + 1; i < result.length; i++) result[i].start = words[i].start + drift;
-  }
 
-  // ── PASS 3: Monotonicity enforcement (strict chronological, ≥ 20ms) ──────
   let collisionsFixed = 0;
-  for (let i = 1; i < result.length; i++) {
-    if (result[i].start <= result[i - 1].start) {
-      result[i].start = result[i - 1].start + 0.02;
-      collisionsFixed += 1;
+  for (let i = 1; i < total; i++) {
+    if (starts[i] <= starts[i - 1] + 0.01) {
+      starts[i] = starts[i - 1] + 0.02;
+      collisionsFixed++;
     }
   }
 
-  // ── PASS 4: Gapless continuity bridging (word end = next word start) ─────
-  for (let i = 0; i < result.length - 1; i++) {
-    result[i].end = result[i + 1].start;
-  }
-  const last = result[result.length - 1];
-  if (last.end <= last.start) last.end = last.start + 0.15;
-
-  const anchored = result.filter((w) => w._anchor).length;
+  const out: Word[] = words.map((w, i) => {
+    const start = round3(Math.max(0, starts[i]));
+    const next = i + 1 < total ? starts[i + 1] : Math.max(spokenEnds[i], starts[i] + 0.15);
+    const spokenEnd = round3(Math.min(Math.max(spokenEnds[i], start + 0.04), Math.max(next, start + 0.04)));
+    return {
+      word: w.word,
+      start,
+      end: round3(Math.max(next, start + 0.04)),
+      spokenEnd,
+      pauseAfterMs: i + 1 < total ? Math.max(0, Math.round((next - spokenEnd) * 1000)) : 0,
+    };
+  });
   return {
-    words: result.map(({ _anchor, ...w }) => ({
-      ...w,
-      start: round3(w.start),
-      end: round3(Math.max(w.end, w.start + 0.04)),
-      pauseAfterMs: 0,
-    })),
-    stats: { anchored, interpolated: total - anchored, total, collisionsFixed },
+    words: out,
+    stats: { anchored, interpolated: total - anchored, total, collisionsFixed, method: "onset-dp" },
     collisionsFixed,
   };
 }
 
-// compute pauseAfterMs for the persisted word list
+// compute pauseAfterMs from the real spoken end (not the bridged end)
 export function stampPauses(words: Word[]): Word[] {
   return words.map((w, i) => {
     const next = words[i + 1];
-    const pause = next ? Math.max(0, (next.start - w.end) * 1000) : 0;
+    const pause = next ? Math.max(0, (next.start - (w.spokenEnd ?? w.end)) * 1000) : 0;
     return { ...w, pauseAfterMs: Math.round(pause) };
   });
 }
 
 // ── Step 8: Deterministic sentence assembly ─────────────────────────────────
+// Uses the *measured* pause after each word (pauseAfterMs), since bridged ends
+// always touch the next start and would hide every pause.
 export function assembleSentences(
   words: Word[],
   { maxWords = 18, pauseBreakSec = 0.7 } = {}
 ): Sentence[] {
   const sentences: Sentence[] = [];
   let startIdx = 0;
+  const pauseOf = (i: number) =>
+    i + 1 < words.length ? (words[i].pauseAfterMs ?? 0) / 1000 || Math.max(0, words[i + 1].start - (words[i].spokenEnd ?? words[i].end)) : 0;
 
   const flush = (endIdx: number) => {
     if (endIdx < startIdx) return;
@@ -241,7 +248,7 @@ export function assembleSentences(
     const isLast = i === words.length - 1;
     const count = i - startIdx + 1;
     const endsWithPunct = /[.!?…]["')\]]*$/.test(w.word);
-    const longPause = !isLast && words[i + 1].start - w.end >= pauseBreakSec && count >= 3;
+    const longPause = !isLast && pauseOf(i) >= pauseBreakSec && count >= 3;
 
     if (isLast || endsWithPunct || longPause) {
       flush(i);
@@ -249,8 +256,7 @@ export function assembleSentences(
       let best = i;
       let bestScore = -Infinity;
       for (let j = startIdx + Math.floor(count / 2); j < i; j++) {
-        const pause = words[j + 1].start - words[j].end;
-        const score = pause + (/[,;:—-]$/.test(words[j].word) ? 1 : 0);
+        const score = pauseOf(j) + (/[,;:—-]$/.test(words[j].word) ? 1 : 0);
         if (score > bestScore) {
           best = j;
           bestScore = score;

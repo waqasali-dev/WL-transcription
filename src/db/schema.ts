@@ -15,6 +15,7 @@ import type {
   StageKey,
   StageState,
   TranscriptDoc,
+  VideoMeta,
 } from "@/lib/types";
 
 export const jobs = pgTable("jobs", {
@@ -23,6 +24,8 @@ export const jobs = pgTable("jobs", {
   sizeBytes: integer("size_bytes").notNull().default(0),
   mediaPath: text("media_path"),
   mediaUrl: text("media_url"),
+  mediaKind: text("media_kind").notNull().default("audio"),
+  videoMeta: jsonb("video_meta").$type<VideoMeta>(),
   durationSec: real("duration_sec"),
   fingerprint: text("fingerprint"),
   status: text("status").notNull().default("queued"),
@@ -44,7 +47,6 @@ export const jobs = pgTable("jobs", {
   settings: jsonb("settings").$type<JobSettings>(),
   stageLog: jsonb("stage_log").$type<StageState[]>(),
   onsets: jsonb("onsets").$type<number[]>(),
-  onsetStrengths: jsonb("onset_strengths").$type<number[]>(),
   silences: jsonb("silences").$type<Silence[]>(),
   energy: jsonb("energy").$type<{ bins: number[]; peak: number }>(),
   transcript: jsonb("transcript").$type<TranscriptDoc>(),
@@ -113,7 +115,6 @@ export const appSettings = pgTable("app_settings", {
   model: text("model").notNull().default("auto"),
   toleranceMs: integer("tolerance_ms").notNull().default(350),
   allowSimulate: boolean("allow_simulate").notNull().default(true),
-  gapless: boolean("gapless").notNull().default(false),
 });
 
 export type { StageKey };
