@@ -3,7 +3,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { useJobStream } from "@/hooks/useJobStream";
 import { fmtBytes, fmtClock, relTime } from "@/lib/format";
 import type { AppSettings, JobSummary, KeyInfo } from "@/lib/types";
-import { Badge, Button, Card, Empty, IconButton, Input, Kbd, Progress, Segmented, Spinner, StatusDot } from "./ui";
+import { Badge, Button, Card, Empty, IconButton, Input, Kbd, Progress, Segmented, Spinner, StatusDot, ToastContainer } from "./ui";
 import {
   IconBolt,
   IconFilm,
@@ -612,6 +612,8 @@ function Workspace() {
           setSettingsDrawer(true);
         }}
       />
+
+      <ToastContainer />
     </div>
   );
 }

@@ -1,5 +1,5 @@
 "use client";
-import { forwardRef, type ButtonHTMLAttributes, type InputHTMLAttributes, type ReactNode } from "react";
+import { forwardRef, useEffect, useState, type ButtonHTMLAttributes, type InputHTMLAttributes, type ReactNode } from "react";
 
 /* ── Button ──────────────────────────────────────────────────────────────── */
 type Variant = "primary" | "secondary" | "ghost" | "danger" | "accent";
@@ -89,21 +89,32 @@ export function Badge({
   className = "",
   children,
   title,
+  dot,
+  pulse,
 }: {
   tone?: Tone;
   className?: string;
   children: ReactNode;
   title?: string;
+  dot?: boolean;
+  pulse?: boolean;
 }) {
   return (
     <span
       title={title}
-      className={`inline-flex shrink-0 items-center gap-1 rounded-full border px-1.5 py-px font-mono text-[10px] font-medium leading-4 tracking-tight ${TONE[tone]} ${className}`}
+      className={`inline-flex shrink-0 items-center gap-1.5 rounded-full border px-2 py-0.5 font-mono text-[10px] font-medium leading-4 tracking-tight transition-all duration-150 ${TONE[tone]} ${className}`}
     >
+      {dot && (
+        <span
+          className={`h-1.5 w-1.5 rounded-full ${pulse ? "animate-pulse" : ""}`}
+          style={{ background: "currentColor" }}
+        />
+      )}
       {children}
     </span>
   );
 }
+
 
 /* ── Card ───────────────────────────────────────────────────────────────── */
 export function Card({ children, className = "" }: { children: ReactNode; className?: string }) {
@@ -330,3 +341,77 @@ export function Tip({ children, tip, side = "top" }: { children: ReactNode; tip:
     </span>
   );
 }
+
+/* ── Toast Notifications ─────────────────────────────────────────────────── */
+export interface ToastItem {
+  id: string;
+  message: string;
+  tone?: "accent" | "success" | "warning" | "danger" | "info";
+  duration?: number;
+}
+
+type ToastListener = (toasts: ToastItem[]) => void;
+const toastListeners = new Set<ToastListener>();
+let toastItems: ToastItem[] = [];
+
+export function toast(message: string, tone: ToastItem["tone"] = "accent", duration = 3000) {
+  const id = Math.random().toString(36).slice(2, 9);
+  const item: ToastItem = { id, message, tone, duration };
+  toastItems = [...toastItems, item];
+  toastListeners.forEach((fn) => fn(toastItems));
+  if (duration > 0) {
+    setTimeout(() => {
+      toastItems = toastItems.filter((t) => t.id !== id);
+      toastListeners.forEach((fn) => fn(toastItems));
+    }, duration);
+  }
+}
+
+export function ToastContainer() {
+  const [items, setItems] = useState<ToastItem[]>(toastItems);
+  useEffect(() => {
+    toastListeners.add(setItems);
+    return () => {
+      toastListeners.delete(setItems);
+    };
+  }, []);
+
+  if (!items.length) return null;
+
+  return (
+    <div className="pointer-events-none fixed right-5 bottom-5 z-[200] flex flex-col gap-2">
+      {items.map((t) => (
+        <div
+          key={t.id}
+          className="pointer-events-auto flex items-center gap-2.5 rounded-xl border border-[var(--border)] bg-[var(--surface)] px-3.5 py-2 font-mono text-[11.5px] text-[var(--fg)] shadow-[var(--shadow-lg)] backdrop-blur-md animate-toast"
+          style={{
+            borderColor:
+              t.tone === "success"
+                ? "var(--success)"
+                : t.tone === "danger"
+                  ? "var(--danger)"
+                  : t.tone === "warning"
+                    ? "var(--warning)"
+                    : "var(--accent)",
+          }}
+        >
+          <span
+            className="h-2 w-2 rounded-full"
+            style={{
+              background:
+                t.tone === "success"
+                  ? "var(--success)"
+                  : t.tone === "danger"
+                    ? "var(--danger)"
+                    : t.tone === "warning"
+                      ? "var(--warning)"
+                      : "var(--accent)",
+            }}
+          />
+          <span>{t.message}</span>
+        </div>
+      ))}
+    </div>
+  );
+}
+
