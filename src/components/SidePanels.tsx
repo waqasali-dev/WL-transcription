@@ -1,9 +1,9 @@
 "use client";
 import { useRef, useState } from "react";
-import { AVAILABLE_MODELS, type AppSettings, type KeyInfo } from "@/lib/types";
+import { DEFAULT_MODELS, type AppSettings, type KeyInfo, type ModelConfig } from "@/lib/types";
 import { fmtBytes, relTime } from "@/lib/format";
 import { Badge, Button, Card, CardHeader, IconButton, Input, Progress } from "./ui";
-import { IconKey, IconRefresh, IconSliders, IconTrash, IconUpload, IconX } from "./icons";
+import { IconCheck, IconKey, IconPlus, IconRefresh, IconSliders, IconTrash, IconUpload, IconX } from "./icons";
 
 export async function uploadMediaFile(
   file: File,
@@ -203,10 +203,89 @@ export function DrawerModal({
 /* ═══ Settings Panel Content ═════════════════════════════════════════════ */
 export function SettingsCard({ value, onChange }: { value: AppSettings | null; onChange: (s: AppSettings) => void }) {
   const [f, setF] = useState<AppSettings>(
-    value ?? { chunkSec: 30, overlapSec: 2, model: "auto", toleranceMs: 350, allowSimulate: true }
+    value ?? {
+      chunkSec: 30,
+      overlapSec: 2,
+      model: "auto",
+      toleranceMs: 350,
+      allowSimulate: true,
+      models: DEFAULT_MODELS,
+    }
   );
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
+
+  // New model creation form state
+  const [newModel, setNewModel] = useState("");
+  const [newRpm, setNewRpm] = useState(15);
+  const [newRpd, setNewRpd] = useState(500);
+  const [newPriority, setNewPriority] = useState<number | null>(null);
+  const [addError, setAddError] = useState<string | null>(null);
+
+  // Synchronize when value changes from outside
+  const models = f.models?.length ? f.models : DEFAULT_MODELS;
+  const totalPriorities = models.length;
+
+  const handleSetPriority = (modelName: string, prio: number | null) => {
+    setF((prev) => {
+      const currentList = prev.models?.length ? prev.models : DEFAULT_MODELS;
+      const nextList = currentList.map((m) => {
+        if (m.model === modelName) {
+          return { ...m, priority: prio };
+        }
+        if (prio !== null && m.priority === prio) {
+          return { ...m, priority: null };
+        }
+        return m;
+      });
+      return { ...prev, models: nextList };
+    });
+  };
+
+  const handleRemoveModel = (modelName: string) => {
+    if (models.length <= 1) return;
+    setF((prev) => {
+      const currentList = prev.models?.length ? prev.models : DEFAULT_MODELS;
+      const nextList = currentList.filter((m) => m.model !== modelName);
+      return { ...prev, models: nextList };
+    });
+  };
+
+  const handleAddModel = () => {
+    const trimmed = newModel.trim();
+    if (!trimmed) {
+      setAddError("Model identifier is required.");
+      return;
+    }
+    if (models.some((m) => m.model.toLowerCase() === trimmed.toLowerCase())) {
+      setAddError(`Model "${trimmed}" is already in the pool.`);
+      return;
+    }
+    const rpm = Math.max(1, Math.min(10000, Number(newRpm) || 15));
+    const rpd = Math.max(1, Math.min(100000, Number(newRpd) || 100));
+
+    const nextModels = models.map((m) =>
+      newPriority !== null && m.priority === newPriority ? { ...m, priority: null } : m
+    );
+
+    nextModels.push({
+      model: trimmed,
+      rpm,
+      rpd,
+      priority: newPriority,
+    });
+
+    setF((prev) => ({ ...prev, models: nextModels }));
+    setNewModel("");
+    setNewRpm(15);
+    setNewRpd(500);
+    setNewPriority(null);
+    setAddError(null);
+  };
+
+  const handleResetDefaults = () => {
+    setF((prev) => ({ ...prev, models: DEFAULT_MODELS }));
+  };
 
   const save = async () => {
     setSaving(true);
@@ -214,7 +293,10 @@ export function SettingsCard({ value, onChange }: { value: AppSettings | null; o
       const r = await fetch("/api/settings", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(f),
+        body: JSON.stringify({
+          ...f,
+          models,
+        }),
       });
       if (r.ok) {
         onChange(await r.json());
@@ -229,8 +311,16 @@ export function SettingsCard({ value, onChange }: { value: AppSettings | null; o
   const field =
     "h-8.5 w-full rounded-md border border-[var(--border)] bg-[var(--surface-2)] px-2.5 font-mono text-[12px] text-[var(--fg)] focus:border-[var(--accent)] focus:outline-none";
 
+  const prioritizedModels = [...models]
+    .filter((m) => m.priority !== null)
+    .sort((a, b) => (a.priority ?? 0) - (b.priority ?? 0));
+  const unsetModels = models.filter((m) => m.priority === null);
+
+  const defaultNames = new Set(DEFAULT_MODELS.map((m) => m.model));
+
   return (
     <div className="space-y-4">
+      {/* ── Audio Chunks ─────────────────────────────────────────────────── */}
       <div className="grid grid-cols-2 gap-3">
         <label className="block">
           <span className="label mb-1 block">Speech chunk (s)</span>
@@ -256,18 +346,253 @@ export function SettingsCard({ value, onChange }: { value: AppSettings | null; o
         </label>
       </div>
 
+      {/* ── Preferred Gemini Tier ────────────────────────────────────────── */}
       <label className="block">
         <span className="label mb-1 block">Preferred Gemini tier</span>
         <select value={f.model} onChange={(e) => setF({ ...f, model: e.target.value })} className={field}>
-          <option value="auto">Auto — LRU rotation across full model pool</option>
-          {AVAILABLE_MODELS.map((m) => (
+          <option value="auto">Auto — Follow configured Model Priority pipeline (Recommended)</option>
+          {models.map((m) => (
             <option key={m.model} value={m.model}>
-              {m.model} ({m.rpm} RPM / {m.rpd} RPD)
+              {m.model} ({m.priority ? `Priority ${m.priority}` : "Unset"} · {m.rpm} RPM / {m.rpd} RPD)
             </option>
           ))}
         </select>
       </label>
 
+      {/* ── Model Priority & Rotation Pipeline ────────────────────────────── */}
+      <div className="space-y-3 rounded-xl border border-[var(--border)] bg-[var(--surface-2)]/60 p-3.5">
+        <div className="flex items-center justify-between">
+          <div>
+            <div className="text-[12.5px] font-semibold text-[var(--fg)]">Model Priority & Failover Pipeline</div>
+            <div className="text-[11px] text-[var(--fg-subtle)] leading-relaxed mt-0.5">
+              Assign 1–{totalPriorities} priority levels. Priority 1 gets the request first. If it rate-limits or fails, the next priority takes over.
+            </div>
+          </div>
+          <button
+            type="button"
+            onClick={handleResetDefaults}
+            className="text-[10px] text-[var(--fg-subtle)] hover:text-[var(--fg)] underline transition-colors"
+          >
+            Reset defaults
+          </button>
+        </div>
+
+        {/* Visual failover path */}
+        <div className="rounded-lg border border-[var(--border)] bg-[var(--surface)] p-2.5">
+          <div className="text-[10.5px] font-mono text-[var(--fg-subtle)] mb-1.5 flex items-center justify-between">
+            <span>Live Failover Chain</span>
+            <span>{prioritizedModels.length} of {models.length} prioritized</span>
+          </div>
+          {prioritizedModels.length > 0 ? (
+            <div className="flex flex-wrap items-center gap-1.5 font-mono text-[11px]">
+              {prioritizedModels.map((m, idx) => (
+                <div key={m.model} className="flex items-center gap-1.5">
+                  <span
+                    className="inline-flex items-center gap-1 rounded-md px-2 py-0.5 font-semibold text-[10.5px]"
+                    style={{
+                      background:
+                        m.priority === 1
+                          ? "rgba(245, 158, 11, 0.15)"
+                          : m.priority === 2
+                            ? "rgba(59, 130, 246, 0.15)"
+                            : m.priority === 3
+                              ? "rgba(139, 92, 246, 0.15)"
+                              : "rgba(16, 185, 129, 0.15)",
+                      color:
+                        m.priority === 1
+                          ? "#f59e0b"
+                          : m.priority === 2
+                            ? "#3b82f6"
+                            : m.priority === 3
+                              ? "#8b5cf6"
+                              : "#10b981",
+                    }}
+                  >
+                    <span className="opacity-70">#{m.priority}</span>
+                    <span>{m.model.replace("gemini-", "")}</span>
+                  </span>
+                  {idx < prioritizedModels.length - 1 && (
+                    <span className="text-[var(--fg-subtle)] text-[10px]">→</span>
+                  )}
+                </div>
+              ))}
+              {unsetModels.length > 0 && (
+                <span className="text-[10px] text-[var(--fg-subtle)] ml-1">
+                  (+{unsetModels.length} unset fallback{unsetModels.length > 1 ? "s" : ""})
+                </span>
+              )}
+            </div>
+          ) : (
+            <div className="text-[11px] text-[var(--fg-subtle)]">
+              No priority levels assigned. Requests rotate evenly across all models.
+            </div>
+          )}
+        </div>
+
+        {/* Model Rows */}
+        <div className="space-y-2">
+          {models.map((m) => {
+            const isCustom = !defaultNames.has(m.model);
+            return (
+              <div
+                key={m.model}
+                className="flex items-center justify-between gap-2.5 rounded-lg border border-[var(--border)] bg-[var(--surface)] p-2.5 transition-colors hover:border-[var(--accent)]/40"
+              >
+                <div className="min-w-0 flex-1">
+                  <div className="flex items-center gap-1.5">
+                    <span className="truncate font-mono text-[12px] font-medium text-[var(--fg)]">
+                      {m.model}
+                    </span>
+                    {isCustom && (
+                      <span className="rounded bg-[var(--accent)]/15 px-1.5 py-0.2 font-mono text-[9px] font-semibold text-[var(--accent)]">
+                        CUSTOM
+                      </span>
+                    )}
+                  </div>
+                  <div className="mt-0.5 flex items-center gap-1.5 text-[10.5px] font-mono text-[var(--fg-subtle)]">
+                    <span>{m.rpm} RPM</span>
+                    <span>·</span>
+                    <span>{m.rpd} RPD</span>
+                    {m.priority !== null && (
+                      <>
+                        <span>·</span>
+                        <span
+                          className="font-medium"
+                          style={{
+                            color:
+                              m.priority === 1
+                                ? "#f59e0b"
+                                : m.priority === 2
+                                  ? "#3b82f6"
+                                  : m.priority === 3
+                                    ? "#8b5cf6"
+                                    : "#10b981",
+                          }}
+                        >
+                          {m.priority === 1
+                            ? "Priority 1 (First)"
+                            : m.priority === 2
+                              ? "Priority 2 (Second)"
+                              : `Priority ${m.priority}`}
+                        </span>
+                      </>
+                    )}
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-2">
+                  <select
+                    value={m.priority ?? ""}
+                    onChange={(e) =>
+                      handleSetPriority(m.model, e.target.value === "" ? null : Number(e.target.value))
+                    }
+                    className="h-8 rounded-md border border-[var(--border)] bg-[var(--surface-2)] px-2 font-mono text-[11.5px] text-[var(--fg)] focus:border-[var(--accent)] focus:outline-none"
+                    aria-label={`Priority for ${m.model}`}
+                  >
+                    <option value="">Unset (Fallback)</option>
+                    {Array.from({ length: totalPriorities }, (_, i) => i + 1).map((p) => {
+                      const takenBy = models.find((x) => x.priority === p && x.model !== m.model);
+                      return (
+                        <option key={p} value={p} disabled={Boolean(takenBy)}>
+                          {`Priority ${p}${takenBy ? ` (taken by ${takenBy.model.replace("gemini-", "")})` : ""}`}
+                        </option>
+                      );
+                    })}
+                  </select>
+
+                  {models.length > 1 && (
+                    <button
+                      type="button"
+                      onClick={() => handleRemoveModel(m.model)}
+                      className="flex h-8 w-8 items-center justify-center rounded-md text-[var(--fg-subtle)] hover:bg-[var(--surface-3)] hover:text-[var(--danger)] transition-colors"
+                      title={`Remove ${m.model}`}
+                      aria-label={`Remove ${m.model}`}
+                    >
+                      <IconTrash size={13} />
+                    </button>
+                  )}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+
+        {/* ── Add Custom Model ───────────────────────────────────────────── */}
+        <div className="rounded-lg border border-dashed border-[var(--border)] bg-[var(--surface)]/70 p-3 space-y-2.5">
+          <div className="flex items-center justify-between">
+            <span className="text-[12px] font-medium text-[var(--fg)]">+ Add Another Model</span>
+            <span className="text-[10px] text-[var(--fg-subtle)]">Available for all API keys</span>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-4 gap-2">
+            <div className="sm:col-span-2">
+              <label className="block text-[10px] text-[var(--fg-subtle)] mb-0.5">Model Name</label>
+              <input
+                type="text"
+                placeholder="e.g. gemini-2.0-flash-exp"
+                value={newModel}
+                onChange={(e) => {
+                  setNewModel(e.target.value);
+                  setAddError(null);
+                }}
+                className={field}
+              />
+            </div>
+            <div>
+              <label className="block text-[10px] text-[var(--fg-subtle)] mb-0.5">RPM Limit</label>
+              <input
+                type="number"
+                min={1}
+                max={1000}
+                value={newRpm}
+                onChange={(e) => setNewRpm(Math.max(1, +e.target.value || 15))}
+                className={field}
+              />
+            </div>
+            <div>
+              <label className="block text-[10px] text-[var(--fg-subtle)] mb-0.5">RPD Limit</label>
+              <input
+                type="number"
+                min={1}
+                max={100000}
+                value={newRpd}
+                onChange={(e) => setNewRpd(Math.max(1, +e.target.value || 500))}
+                className={field}
+              />
+            </div>
+          </div>
+
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2 pt-1">
+            <div className="flex items-center gap-2">
+              <label className="text-[10.5px] text-[var(--fg-subtle)] whitespace-nowrap">Initial Priority:</label>
+              <select
+                value={newPriority ?? ""}
+                onChange={(e) => setNewPriority(e.target.value === "" ? null : Number(e.target.value))}
+                className="h-7.5 rounded-md border border-[var(--border)] bg-[var(--surface-2)] px-2 font-mono text-[11px] text-[var(--fg)] focus:border-[var(--accent)] focus:outline-none"
+              >
+                <option value="">Unset (Fallback)</option>
+                {Array.from({ length: totalPriorities + 1 }, (_, i) => i + 1).map((p) => {
+                  const takenBy = models.find((x) => x.priority === p);
+                  return (
+                    <option key={p} value={p} disabled={Boolean(takenBy)}>
+                      {`Priority ${p}${takenBy ? ` (taken by ${takenBy.model.replace("gemini-", "")})` : ""}`}
+                    </option>
+                  );
+                })}
+              </select>
+            </div>
+
+            <Button variant="secondary" size="xs" onClick={handleAddModel}>
+              <IconPlus size={12} className="mr-1" />
+              Add Model to Pool
+            </Button>
+          </div>
+
+          {addError && <div className="text-[11px] text-[var(--danger)]">{addError}</div>}
+        </div>
+      </div>
+
+      {/* ── Fallback Onset Tolerance ────────────────────────────────────── */}
       <label className="block">
         <span className="mb-1 flex items-center justify-between">
           <span className="label">Fallback onset tolerance</span>
@@ -286,6 +611,7 @@ export function SettingsCard({ value, onChange }: { value: AppSettings | null; o
         />
       </label>
 
+      {/* ── Simulation Fallback Toggle ──────────────────────────────────── */}
       <div className="rounded-lg border border-[var(--border)] bg-[var(--surface-2)] p-3">
         <div className="flex items-center justify-between gap-3">
           <div>
@@ -309,7 +635,8 @@ export function SettingsCard({ value, onChange }: { value: AppSettings | null; o
         </div>
       </div>
 
-      <div className="flex items-center gap-2">
+      {/* ── Save Button ─────────────────────────────────────────────────── */}
+      <div className="flex items-center gap-2 pt-1">
         <Button variant="primary" size="md" className="flex-1" onClick={save} loading={saving}>
           Save configuration
         </Button>
@@ -460,7 +787,7 @@ export function KeysCard({
                   </div>
                 )}
                 <div className="mt-2 space-y-1">
-                  {k.models.slice(0, 4).map((m) => (
+                  {k.models.map((m) => (
                     <div key={m.model} className="flex items-center gap-2">
                       <span className="w-28 truncate font-mono text-[9.5px] text-[var(--fg-subtle)]">
                         {m.model.replace("gemini-", "")}

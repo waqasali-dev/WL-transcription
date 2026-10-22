@@ -1,8 +1,8 @@
 import crypto from "node:crypto";
 import { eq } from "drizzle-orm";
 import { db } from "@/db";
-import { geminiKeys } from "@/db/schema";
-import { AVAILABLE_MODELS, type KeyInfo, type KeyModelUsage } from "@/lib/types";
+import { appSettings, geminiKeys } from "@/db/schema";
+import { DEFAULT_MODELS, type KeyInfo, type KeyModelUsage, type ModelConfig } from "@/lib/types";
 
 export const RPD_RESET_HOUR_LOCAL = 13; // daily window resets at 1:00 PM local
 
@@ -70,6 +70,22 @@ function modelState(k: KeyState, model: string, now = new Date()): ModelState {
 class KeyManager {
   keys: KeyState[] = [];
   private lastLoad = 0;
+  private configuredModels: ModelConfig[] = [...DEFAULT_MODELS];
+
+  setModels(models: ModelConfig[]) {
+    if (Array.isArray(models) && models.length > 0) {
+      this.configuredModels = models.map((m) => ({
+        model: String(m.model).trim(),
+        rpm: Math.max(1, Number(m.rpm) || 15),
+        rpd: Math.max(1, Number(m.rpd) || 100),
+        priority: typeof m.priority === "number" && m.priority > 0 ? Math.round(m.priority) : null,
+      }));
+    }
+  }
+
+  getModels(): ModelConfig[] {
+    return this.configuredModels;
+  }
 
   /**
    * Discover env keys (api1..N, GEMINI_API_KEY, GEMINI_API_KEY_N) + DB keys.
@@ -81,6 +97,22 @@ class KeyManager {
     const now = Date.now();
     if (!force && now - this.lastLoad < 10_000 && this.keys.length) return;
     this.lastLoad = now;
+
+    try {
+      const [appCfg] = await db
+        .select({ models: appSettings.models })
+        .from(appSettings)
+        .where(eq(appSettings.id, 1))
+        .limit(1);
+      if (appCfg?.models) {
+        const parsed = JSON.parse(appCfg.models);
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          this.setModels(parsed);
+        }
+      }
+    } catch {
+      /* ignore */
+    }
 
     const prevById = new Map(this.keys.map((k) => [k.keyId, k]));
 
@@ -125,8 +157,8 @@ class KeyManager {
       const prev = prevById.get(kid);
       const models = prev?.models ?? new Map<string, ModelState>();
       // Hydrate persisted daily count on cold boot if window matches
-      if (!prev && k.rpdUsed > 0 && k.rpdWindowStart === currentWin && AVAILABLE_MODELS.length > 0) {
-        models.set(AVAILABLE_MODELS[0].model, {
+      if (!prev && k.rpdUsed > 0 && k.rpdWindowStart === currentWin && this.configuredModels.length > 0) {
+        models.set(this.configuredModels[0].model, {
           rpmLog: [],
           rpdUsed: k.rpdUsed,
           rpdWindowStart: currentWin,
@@ -237,8 +269,14 @@ class KeyManager {
     return null;
   }
 
-  modelPool(preferredModel?: string): { model: string; rpm: number; rpd: number }[] {
-    const all = [...AVAILABLE_MODELS];
+  modelPool(preferredModel?: string): ModelConfig[] {
+    const all = [...this.configuredModels];
+    all.sort((a, b) => {
+      if (a.priority != null && b.priority != null) return a.priority - b.priority;
+      if (a.priority != null && b.priority == null) return -1;
+      if (a.priority == null && b.priority != null) return 1;
+      return 0;
+    });
     if (preferredModel && preferredModel !== "auto") {
       const pref = all.find((m) => m.model === preferredModel);
       if (pref) return [pref, ...all.filter((m) => m.model !== preferredModel)];
@@ -284,7 +322,7 @@ class KeyManager {
     const now = Date.now();
     for (const k of this.keys) {
       if (k.disabledReason) continue;
-      for (const m of AVAILABLE_MODELS) {
+      for (const m of this.configuredModels) {
         const ms = modelState(k, m.model);
         if (ms.dead) continue;
         if (ms.rpdUsed >= m.rpd) continue;
@@ -433,7 +471,7 @@ class KeyManager {
       from: k.from,
       project: k.project,
       source: k.source,
-      models: AVAILABLE_MODELS.map((m) => {
+      models: this.configuredModels.map((m) => {
         const ms = modelState(k, m.model);
         const rpmUsed = ms.rpmLog.filter((t) => Date.now() - t < 60_000).length;
         const until = Math.max(ms.minuteUntil, ms.dailyUntil);
@@ -450,9 +488,14 @@ class KeyManager {
       disabledReason: k.disabledReason,
       lastUsedAt: k.lastUsedAt ? new Date(k.lastUsedAt).toISOString() : null,
     }));
-    return { keys, models: AVAILABLE_MODELS.map((m) => ({ ...m })) };
+    return { keys, models: this.configuredModels.map((m) => ({ ...m })) };
   }
 }
 
 const g = globalThis as typeof globalThis & { __keyManager?: KeyManager };
+if (g.__keyManager && typeof (g.__keyManager as any).setModels !== "function") {
+  const oldKeys = g.__keyManager.keys;
+  g.__keyManager = new KeyManager();
+  g.__keyManager.keys = oldKeys;
+}
 export const keyManager = g.__keyManager ?? (g.__keyManager = new KeyManager());

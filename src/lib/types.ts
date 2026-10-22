@@ -294,22 +294,34 @@ export interface JobDetail extends JobSummary {
   events: EventRow[];
 }
 
+export interface ModelConfig {
+  model: string;
+  rpm: number;
+  rpd: number;
+  priority: number | null; // 1-based priority index, or null for unset
+}
+
+export const DEFAULT_MODELS: ModelConfig[] = [
+  { model: "gemini-3.6-flash", rpm: 5, rpd: 20, priority: 1 },
+  { model: "gemini-3.5-flash", rpm: 5, rpd: 20, priority: 2 },
+  { model: "gemini-3.5-flash-lite", rpm: 15, rpd: 500, priority: 3 },
+  { model: "gemini-3.1-flash-lite", rpm: 15, rpd: 500, priority: 4 },
+  { model: "gemini-2.5-flash", rpm: 10, rpd: 100, priority: null },
+  { model: "gemini-2.5-flash-lite", rpm: 15, rpd: 500, priority: null },
+];
+
+export const AVAILABLE_MODELS: { model: string; rpm: number; rpd: number }[] = DEFAULT_MODELS.map(
+  ({ model, rpm, rpd }) => ({ model, rpm, rpd })
+);
+
 export interface AppSettings {
   chunkSec: number;
   overlapSec: number;
   model: string;
   toleranceMs: number;
   allowSimulate: boolean;
+  models: ModelConfig[];
 }
-
-export const AVAILABLE_MODELS: { model: string; rpm: number; rpd: number }[] = [
-  { model: "gemini-3.6-flash", rpm: 5, rpd: 20 },
-  { model: "gemini-3.5-flash", rpm: 5, rpd: 20 },
-  { model: "gemini-3.5-flash-lite", rpm: 15, rpd: 500 },
-  { model: "gemini-3.1-flash-lite", rpm: 15, rpd: 500 },
-  { model: "gemini-2.5-flash", rpm: 10, rpd: 100 },
-  { model: "gemini-2.5-flash-lite", rpm: 15, rpd: 500 },
-];
 
 export function fmtClock(sec: number): string {
   if (!Number.isFinite(sec) || sec < 0) sec = 0;

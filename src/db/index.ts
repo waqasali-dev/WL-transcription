@@ -138,8 +138,11 @@ function initDb(): AppDb {
       overlap_sec integer NOT NULL DEFAULT 2,
       model text NOT NULL DEFAULT 'auto',
       tolerance_ms integer NOT NULL DEFAULT 350,
-      allow_simulate boolean NOT NULL DEFAULT true
+      allow_simulate boolean NOT NULL DEFAULT true,
+      models text
     );
+
+    ALTER TABLE app_settings ADD COLUMN IF NOT EXISTS models text;
 
     INSERT INTO app_settings (id, chunk_sec, overlap_sec, model, tolerance_ms, allow_simulate)
     VALUES (1, 30, 2, 'auto', 350, true)

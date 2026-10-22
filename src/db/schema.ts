@@ -115,6 +115,7 @@ export const appSettings = pgTable("app_settings", {
   model: text("model").notNull().default("auto"),
   toleranceMs: integer("tolerance_ms").notNull().default(350),
   allowSimulate: boolean("allow_simulate").notNull().default(true),
+  models: text("models"),
 });
 
 export type { StageKey };
